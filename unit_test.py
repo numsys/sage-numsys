@@ -4,6 +4,9 @@ from gns import *
 import unittest
 
 class RadixSystemTest(unittest.TestCase):
+    def setUp(self):
+        self.debug = True
+
     def test_necessary_exception(self):
         with self.assertRaises(RadixSystemFullResidueSystemException):
             m = Matrix(ZZ, [[2, -1], [1, 2]])
@@ -134,7 +137,7 @@ class RadixSystemTest(unittest.TestCase):
             },
         ]
         for subject in subjects:
-            if g_debug_numsys_test_suite:
+            if self.debug:
                 print("---------------------")
                 print("Testing case")
                 print(subject["m"])
@@ -146,7 +149,7 @@ class RadixSystemTest(unittest.TestCase):
                 subject["numsys"] = RadixSystem(subject["m"], subject["digits"],
                                                 operator=RadixSystemAlwaysExceptionOperator())
 
-            if g_debug_numsys_test_suite:
+            if self.debug:
                 print(subject["m"])
                 print("digits:")
                 print(subject["numsys"].get_digits())
@@ -159,20 +162,20 @@ class RadixSystemTest(unittest.TestCase):
 
             if "phiTests" in subject:
                 for test_case in subject["phiTests"]:
-                    if g_debug_numsys_test_suite:
+                    if self.debug:
                         print("Phi test from", test_case["from"])
 
                     self.assertEqual(subject["numsys"].phi_function(test_case["from"]), test_case["to"])
 
             if "orbitTests" in subject:
                 for test_case in subject["orbitTests"]:
-                    if g_debug_numsys_test_suite:
+                    if self.debug:
                         print("Orbit test from", test_case["from"])
 
                     self.assertEqual(subject["numsys"].get_orbit_from(test_case["from"]), test_case["to"])
 
             if "coverBox" in subject:
-                if g_debug_numsys_test_suite:
+                if self.debug:
                     print("Cover box test")
 
                 self.assertEqual(subject["numsys"].compute_cover_box(), subject["coverBox"])
@@ -218,11 +221,7 @@ class RadixSystemTest(unittest.TestCase):
         rs = RadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         self.assertTrue(rs.smart_decide())
 
-def start_numsys_unit_test(debug=False):
-    global g_debug_numsys_test_suite
-    g_debug_numsys_test_suite = debug
-    unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
-        unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))
+unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
+    unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))
 
 
-start_numsys_unit_test(True)

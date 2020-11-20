@@ -16,6 +16,9 @@ def update(d, u):
 
 
 class RadixSystemDrawer:
+    def __init__(self):
+        pass
+
     def get_fractions_set_plot(self, rs, iter_num=6, rgbcolor=(0, 0, 0), flag=-1):
         """
         Computes the set of points in the fraction set for plotting

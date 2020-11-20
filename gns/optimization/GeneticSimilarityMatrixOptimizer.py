@@ -57,7 +57,7 @@ class GeneticSimilarityMatrixOptimizer(object):
     def default_transform_function(self, start_val, t):
         return t * start_val[0] * t.inverse(), t * start_val[1], start_val[2]
 
-    def genetic(self, start_val, cand_num, num_of_cand_to_mutate, mutate_num, iterate_num, target_function, recombination=0,
+    def genetic(self, start_val, number_of_candidates, number_of_candidates_to_mutate, mutate_num, iterate_num, target_function, recombination=0,
                 timeout=None):
 
         n = start_val[0].nrows()
@@ -72,14 +72,14 @@ class GeneticSimilarityMatrixOptimizer(object):
                     print(candidate)
                     print("-")
 
-            candidate_number_iterate_begin = min(len(candidates), num_of_cand_to_mutate)
+            candidate_number_iterate_begin = min(len(candidates), number_of_candidates_to_mutate)
             for l in range(candidate_number_iterate_begin):
                 if self.debug:
                     print("------Begin mutate of-----------")
                     print(candidates[l])
                     print("---------")
 
-                for k in range(int(min(n * (n - 1) / 2, mutate_num * (cand_num - candidate_number_iterate_begin + 1)))):
+                for k in range(int(min(n * (n - 1) / 2, mutate_num * (number_of_candidates - candidate_number_iterate_begin + 1)))):
                     if len(candidates[l][2]) >= n * (n - 1) / 2:
                         break  # If we tried every mutate position, we skip it
 
@@ -111,7 +111,7 @@ class GeneticSimilarityMatrixOptimizer(object):
 
             candidates = sorted(candidates, key=lambda x: x[1])
 
-            # Merge up duplicates (use the sorted list, the similar matrixes must be next to each other)
+            # Merge up duplicates (use the sorted list, the similar matrices must be next to each other)
             i = 0
             while i < len(candidates) - 1:
                 # compare the volume first before full matrix compare (speed)
@@ -131,5 +131,5 @@ class GeneticSimilarityMatrixOptimizer(object):
                 for candidate in candidates:
                     print(candidate)
                     print("-")
-            candidates = candidates[0:min(cand_num, len(candidates))]
+            candidates = candidates[0:min(number_of_candidates, len(candidates))]
         return best

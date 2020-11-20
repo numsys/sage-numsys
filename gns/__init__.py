@@ -10,7 +10,7 @@ __all__ = [
     'RadixSystemExpansivityException',
     'RadixSystemUnitConditionException',
     'RadixSystemRegularityException',
-    'RadixSystemOptimalizationFailed',
+    'RadixSystemOptimizationFailed',
     'RadixSystemSmartDecideTimeout',
     'RadixSystemAlwaysExceptionOperator',
 

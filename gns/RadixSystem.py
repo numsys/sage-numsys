@@ -35,7 +35,7 @@ class RadixSystemRegularityException(RadixSystemException):
         self.value = value
 
 
-class RadixSystemOptimalizationFailed(RadixSystemException):
+class RadixSystemOptimizationFailed(RadixSystemException):
     def __init__(self, value):
         self.value = value
 
@@ -419,7 +419,7 @@ class RadixSystem(object):
         optimizer = GeneticSimilarityMatrixOptimizer()
 
         if self.dimension == 1:
-            raise RadixSystemOptimalizationFailed("Can't optimize 1 sized matrix!")
+            raise RadixSystemOptimizationFailed("Can't optimize 1 sized matrix!")
 
         if target_function is None:
             target_function = calculate_volume
@@ -575,6 +575,6 @@ class RadixSystem(object):
         print("Base:", self.base)
         print("Digit set:", self.digits)
         print("Dimension:", self.dimension)
-        print("Seterminant:", self.determinant)
+        print("Determinant:", self.determinant)
         print("Smith U:", self.smith_u)
         print("Smith diagonal:", self.smith_diagonal)
