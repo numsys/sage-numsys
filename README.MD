@@ -8,3 +8,24 @@ http://doc.sagemath.org/html/en/installation/
 - At the top right of the modal window, click on the gear and select "Add..."
 - Choose the "System Interpreter at the left side"
 - Select the Python interpreter of the SageMath. (Sage 9.2 version case: [Your SageMath folder]/local/bin/python3)
+
+# Using in console Linux
+
+If you already linked your sage into folder that contained in the $PATH enviroment variable, you can simply run the unit test by the following command:
+```
+sage unit_test.py
+```
+That command will initiate a python interpreter that already have the correct local packages.
+
+## Troubleshoot
+
+List the folder that should contain the link to the sage.
+```
+ls /usr/local/bin/|grep sage
+```
+
+Check the path enviroment variable, if contains the folder where you added the link of the sage.
+```
+echo $PATH
+```
+
