@@ -28,11 +28,11 @@ def create_companion_matrix_from_polynom(p):
     return m
 
 
-def coefficient_string_to_polynom(coefString):
+def coefficient_string_to_polynom(coefficient_string):
     """
     >>> coefficient_string_to_polynom('1 2 1')
     x^2 + 2*x + 1
     >>> coefficient_string_to_polynom('5 3 4 5 1')
     x^4 + 5*x^3 + 4*x^2 + 3*x + 5
     """
-    return ZZ['x'](coefString.split(" "))
+    return ZZ['x'](coefficient_string.split(" "))

@@ -3,6 +3,7 @@ from gns import *
 
 import unittest
 
+
 class RadixSystemTest(unittest.TestCase):
     def setUp(self):
         self.debug = True
@@ -198,8 +199,8 @@ class RadixSystemTest(unittest.TestCase):
         optimized_vol, optimized_volume_t = rs.optimize(return_transformation_also=True, timeout=30)
 
         optimized_phi, optimized_volt_t = rs.optimize(
-            target_function=lambda act_val, transform_matrix: phi_optimize_target_function(act_val, transform_matrix,
-                                                                                           optimized_volume_t.inverse()),
+            target_function=lambda act_val, transformation_matrix: phi_optimize_target_function(act_val, transformation_matrix,
+                                                                                                optimized_volume_t.inverse()),
             return_transformation_also=True, debug=False, timeout=None)
 
         transform_matrix = optimized_volt_t * optimized_volume_t.inverse()
@@ -220,6 +221,7 @@ class RadixSystemTest(unittest.TestCase):
 
         rs = RadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         self.assertTrue(rs.smart_decide())
+
 
 unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
     unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))

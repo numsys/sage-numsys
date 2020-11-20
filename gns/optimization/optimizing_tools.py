@@ -11,7 +11,7 @@ def count_non_zeroes(m):
 
 
 def count_smith_weight(m):
-    sm, sm_u, smV = m.smith_form()
+    sm, sm_u, sm_v = m.smith_form()
     weight = 0
     for i in range(sm.nrows()):
         if sm[i, i] != 1:
@@ -21,14 +21,14 @@ def count_smith_weight(m):
     return weight
 
 
-def calculate_volume(actVal, T=None, epsilon=0.01):
-    n = actVal[0].nrows()
+def calculate_volume(actual_value, transform=None, epsilon=0.01):
+    n = actual_value[0].nrows()
     m_k = matrix.identity(n)
     lower = [0] * n
     upper = [0] * n
     while True:
-        m_k = m_k * actVal[0]
-        crs_k = m_k * actVal[1]
+        m_k = m_k * actual_value[0]
+        crs_k = m_k * actual_value[1]
         minimum = [0] * n
         maximum = [0] * n
         for i in range(n):
@@ -48,15 +48,15 @@ def calculate_volume(actVal, T=None, epsilon=0.01):
     return vol
 
 
-def dimension_target_function(actVal, T=None, epsilon=0.01):
+def dimension_target_function(avtual_value, transform=None, epsilon=0.01):
     print("Start")
-    n = actVal[0].nrows()
+    n = avtual_value[0].nrows()
     m_k = matrix.identity(n)
     lower = [0] * n
     upper = [0] * n
     while True:
-        m_k = m_k * actVal[0]
-        crs_k = m_k * actVal[1]
+        m_k = m_k * avtual_value[0]
+        crs_k = m_k * avtual_value[1]
         minimum = [0] * n
         maximum = [0] * n
         for i in range(n):
@@ -82,22 +82,22 @@ def dimension_target_function(actVal, T=None, epsilon=0.01):
     return ret
 
 
-def complex_target_function(actVal, T, epsilon=0.01):
-    m = actVal[0].inverse()
-    vol = calculate_volume(actVal, T)
+def complex_target_function(actual_value, transform, epsilon=0.01):
+    m = actual_value[0].inverse()
+    vol = calculate_volume(actual_value, transform)
     smith_w = count_smith_weight(m)
-    inv_non_zeros = count_non_zeroes(actVal[0])
+    inv_non_zeros = count_non_zeroes(actual_value[0])
     return vol * (inv_non_zeros + smith_w)
 
 
-def phi_optimize_target_function(act_val, T, additional_transform=None):
-    m = act_val[0].inverse()
+def phi_optimize_target_function(actual_value, transform, additional_transform=None):
+    m = actual_value[0].inverse()
     smith_w = count_smith_weight(m)
-    inv_non_zeros = count_non_zeroes(act_val[0])
+    inv_non_zeros = count_non_zeroes(actual_value[0])
     if additional_transform is None:
-        transform_non_zeros = count_non_zeroes(T)
+        transform_non_zeros = count_non_zeroes(transform)
     else:
-        transform_non_zeros = count_non_zeroes(T * additional_transform)
+        transform_non_zeros = count_non_zeroes(transform * additional_transform)
 
     return inv_non_zeros + smith_w + transform_non_zeros
 

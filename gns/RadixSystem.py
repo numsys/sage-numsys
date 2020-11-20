@@ -363,7 +363,7 @@ class RadixSystem(object):
 
         transform_matrix = optimize_phi_t * optimize_vol_t.inverse()
         estimated_decide_time = optimized_phi.estimate_decide_time(min(actual_volume * 0.1, 5000),
-                                                                 volume=optimized_vol.get_cover_box_volume())
+                                                                   volume=optimized_vol.get_cover_box_volume())
         if debug:
             print("Second runtime estimation", estimated_decide_time)
         if estimated_decide_time < optimal_runtime:
@@ -393,7 +393,7 @@ class RadixSystem(object):
     def probability_gns_test(self, number_of_tries=100):
         abs_constant_term = len(self.get_digits())
         n_shell = [x for x in
-                  itertools.product(range(-abs_constant_term, abs_constant_term + 1), repeat=self.get_dimension())]
+                   itertools.product(range(-abs_constant_term, abs_constant_term + 1), repeat=self.get_dimension())]
         for i in range(number_of_tries):
             random_point = random.choice(n_shell)
             orbit = self.get_orbit_from(random_point)
@@ -499,7 +499,7 @@ class RadixSystem(object):
         self.sparse_mode = sparse_mode
         self.created_from = created_from
 
-        if type(m) == type([]):
+        if isinstance(m,list):
             m = Matrix(ZZ, len(m), m)
 
         if self.sparse_mode:
@@ -536,7 +536,6 @@ class RadixSystem(object):
         self.low_box = [0] * self.dimension
         self.up_box = [0] * self.dimension
 
-        ##Set Norm Type
         if operator is None:
             self.operator = RadixSystemOperator()
         else:

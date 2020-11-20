@@ -24,7 +24,7 @@ class RadixSystemOperator(object):
             self.norm_type = 1
         elif (self.norm_type == 2 or self.norm_type is None) and rs.denseInverseM.norm(2) < 1:
             self.norm_type = 2
-        elif (self.norm_type == "jacobi" or self.norm_type is None):
+        elif self.norm_type == "jacobi" or self.norm_type is None:
             self.norm_type = "jacobi"
             self.construct_operator_norm(rs)
         else:
@@ -32,11 +32,11 @@ class RadixSystemOperator(object):
 
     def norm(self, v):
         if self.norm_type == "jacobi":
-            return ((self.oper_s * v).norm(Infinity))
+            return (self.oper_s * v).norm(Infinity)
         elif self.norm_type == "frob":
-            return ((self.oper_s * v).norm('frob'))
+            return (self.oper_s * v).norm('frob')
         elif self.norm_type is not None:
-            return ((v).norm(self.norm_type))
+            return v.norm(self.norm_type)
         else:
             raise RadixSystemOperatorException("Operator not generated!")
 

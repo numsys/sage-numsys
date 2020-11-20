@@ -73,28 +73,28 @@ class GeneticSimilarityMatrixOptimizer(object):
                     print("-")
 
             candidate_number_iterate_begin = min(len(candidates), number_of_candidates_to_mutate)
-            for l in range(candidate_number_iterate_begin):
+            for candidate_index in range(candidate_number_iterate_begin):
                 if self.debug:
                     print("------Begin mutate of-----------")
-                    print(candidates[l])
+                    print(candidates[candidate_index])
                     print("---------")
 
                 for k in range(int(min(n * (n - 1) / 2, mutate_num * (number_of_candidates - candidate_number_iterate_begin + 1)))):
-                    if len(candidates[l][2]) >= n * (n - 1) / 2:
+                    if len(candidates[candidate_index][2]) >= n * (n - 1) / 2:
                         break  # If we tried every mutate position, we skip it
 
                     while True:
                         i = random.randint(0, n - 2)
                         j = random.randint(i + 1, n - 1)
 
-                        if (i, j) not in candidates[l][2]:
+                        if (i, j) not in candidates[candidate_index][2]:
                             break
 
-                    candidates[l][2].append((i, j))
+                    candidates[candidate_index][2].append((i, j))
                     if self.debug:
-                        print(i, j, candidates[l][2])
+                        print(i, j, candidates[candidate_index][2])
 
-                    new_candidates = self.mutate(start_val, i, j, candidates[l][0], target_function,
+                    new_candidates = self.mutate(start_val, i, j, candidates[candidate_index][0], target_function,
                                                  self.default_transform_function)
                     candidates = candidates + new_candidates
                     if timeout is not None and self.timeout_timer.get_time() > timeout:
