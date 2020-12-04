@@ -141,7 +141,7 @@ class RadixSystem(object):
         The output is the coordinates of the lower and the upper corners of the box
         info - output to the screen, which can be True or False
         """
-        if hasattr(self, "coverBoxSize"):
+        if hasattr(self, "cover_box_size"):
             return self.cover_box_size
 
         x = matrix.identity(self.dimension)
