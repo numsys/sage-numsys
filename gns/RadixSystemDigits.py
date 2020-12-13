@@ -12,6 +12,20 @@ class RadixSystemDigitsException(Exception):
 
 
 class RadixSystemDigits(object):
+    def get_congruent_element(self, v, rs):
+        """
+        Computes the congruent element for a given point v
+        """
+        res = 0
+        i = rs.dimension - 1
+        while i >= 0 and rs.smith_diagonal[i] > 1:
+            s = 0
+            for j in range(rs.dimension):
+                s = s + rs.smith_u[i, j] * v[j]
+            res = res * rs.smith_diagonal[i] + (s % rs.smith_diagonal[i])
+            i = i - 1
+        return rs.digitsHash[res]
+
     def __init__(self, digits=None):
         self.digits = digits
 
@@ -57,7 +71,7 @@ class RadixSystemShiftedCanonicalDigits(RadixSystemDigits):
 class RadixSystemAdjointDigits(RadixSystemDigits):
     def get_digit_set(self, rs):
         # first generating a complete residue system to cr_set
-        insm_u = rs.smithU.inverse()
+        insm_u = rs.smith_u.inverse()
         cr_set = []
         v = [0] * rs.dimension
         j = 0
@@ -79,8 +93,23 @@ class RadixSystemAdjointDigits(RadixSystemDigits):
             if i == [0] * rs.dimension:
                 bs.append(i)
             else:
-                bs.append([x / rs.determinant for x in rs.base * vector(rs.get_adjoint_congruent_class(i))])
+                bs.append([x / rs.determinant for x in rs.base * vector(self.get_adjoint_congruent_class(i,rs))])
         return bs
+    def get_adjoint_congruent_class(self, v, rs):
+        """
+        Computes the congruent class of a given vector v using the Adjoint method
+        """
+        def get_symmetric_modulo(num, mod):
+            return Mod(num, mod).lift_centered()
+
+        v1 = []
+        for i in range(rs.dimension):
+            s = 0
+            for j in range(rs.dimension):
+                s = (s + rs.adjoint_m[i, j] * v[j])
+            s = get_symmetric_modulo(s, rs.determinant)
+            v1.append(s)
+        return v1
 
 
 class RadixSystemDenseDigits(RadixSystemAdjointDigits):
@@ -88,23 +117,24 @@ class RadixSystemDenseDigits(RadixSystemAdjointDigits):
         bset = super(RadixSystemDenseDigits, self).get_digit_set(rs)
         tempset = []
 
+        operator_matrix = rs.operator.operator
         while tempset != bset:
             tempset = bset
             bset = []
             for v in tempset:
-                nor = (rs.oper_s * vector(v)).norm()
+                nor = (operator_matrix * vector(v)).norm()
                 for i in range(rs.dimension):
                     v[i] = v[i] + rs.abs_determinant
                     ok = 1
-                    while (rs.oper_s * vector(v)).norm(Infinity) < nor:
+                    while (operator_matrix * vector(v)).norm(Infinity) < nor:
                         v[i] = v[i] + rs.abs_determinant
-                        nor = (rs.oper_s * vector(v)).norm(Infinity)
+                        nor = (operator_matrix * vector(v)).norm(Infinity)
                         ok = 0
                     if ok == 1:
                         v[i] = v[i] - 2 * rs.abs_determinant
-                        while (rs.oper_s * vector(v)).norm(Infinity) < nor:
+                        while (operator_matrix * vector(v)).norm(Infinity) < nor:
                             v[i] = v[i] - rs.abs_determinant
-                            nor = (rs.oper_s * vector(v)).norm(Infinity)
+                            nor = (operator_matrix * vector(v)).norm(Infinity)
                             ok = 0
                         v[i] = v[i] + rs.abs_determinant
                     else:

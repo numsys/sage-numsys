@@ -45,9 +45,6 @@ class RadixSystemSmartDecideTimeout(RadixSystemException):
         self.value = value
 
 
-def get_symmetric_modulo(num, mod):
-    return mod(num, mod).lift_centered()
-
 
 def to_sparse(m):
     return m
@@ -69,45 +66,18 @@ def to_dense(m):
 
 
 class RadixSystem(object):
-    def get_congruent_element(self, v):
-        """
-        Computes the congruent element for a given point v
-        """
-        res = 0
-        i = self.dimension - 1
-        while i >= 0 and self.smith_diagonal[i] > 1:
-            s = 0
-            for j in range(self.dimension):
-                s = s + self.smith_u[i, j] * v[j]
-            res = res * self.smith_diagonal[i] + (s % self.smith_diagonal[i])
-            i = i - 1
-        return self.digitsHash[res]
-
-    def get_adjoint_congruent_class(self, v):
-        """
-        Computes the congruent class of a given vector v using the Adjoint method
-        """
-        v1 = []
-        for i in range(self.dimension):
-            s = 0
-            for j in range(self.dimension):
-                s = (s + self.adjoint_m[i, j] * v[j])
-            s = get_symmetric_modulo(s, self.determinant)
-            v1.append(s)
-        return v1
-
     def phi_function(self, v):
         """
         Computes the Phi function for a given point v
         """
-        digit = self.get_congruent_element(v)
+        digit = self.digit_object.get_congruent_element(v, self)
         return (self.inverse_base * (vector(v) - vector(digit))).list()
 
     def phi_function_with_digit(self, v):
         """
         Computes the Phi function for a given point v and gives back the congruent element as well
         """
-        digit = self.get_congruent_element(v)
+        digit = self.digit_object.get_congruent_element(v, self)
         return (self.inverse_base * (vector(v) - vector(digit))).list(), digit
 
     def get_orbit_from(self, v):
@@ -544,11 +514,12 @@ class RadixSystem(object):
         self.operator.init_operator(self)
 
         if digits is None:
-            self.digits = RadixSystemCanonicalDigits().get_digit_set(self)
+            self.digit_object = RadixSystemCanonicalDigits()
         elif isinstance(digits, list):
-            self.digits = digits
+            self.digit_object = RadixSystemDigits(digits)
         else:
-            self.digits = digits.get_digit_set(self)
+            self.digit_object = digits
+        self.digits = self.digit_object.get_digit_set(self)
 
         self.check_crs_property_and_build_digits_hashes()
 

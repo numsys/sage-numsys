@@ -18,11 +18,11 @@ class RadixSystemOperator(object):
         self.norm_type = norm_type
 
     def init_operator(self, rs):
-        if (self.norm_type == Infinity or self.norm_type is None) and rs.denseInverseM.norm(Infinity) < 1:
+        if (self.norm_type == Infinity or self.norm_type is None) and rs.dense_inverse_m.norm(Infinity) < 1:
             self.norm_type = Infinity
-        elif (self.norm_type == 1 or self.norm_type is None) and rs.denseInverseM.norm(1) < 1:
+        elif (self.norm_type == 1 or self.norm_type is None) and rs.dense_inverse_m.norm(1) < 1:
             self.norm_type = 1
-        elif (self.norm_type == 2 or self.norm_type is None) and rs.denseInverseM.norm(2) < 1:
+        elif (self.norm_type == 2 or self.norm_type is None) and rs.dense_inverse_m.norm(2) < 1:
             self.norm_type = 2
         elif self.norm_type == "jacobi" or self.norm_type is None:
             self.norm_type = "jacobi"
@@ -32,19 +32,19 @@ class RadixSystemOperator(object):
 
     def norm(self, v):
         if self.norm_type == "jacobi":
-            return (self.oper_s * v).norm(Infinity)
+            return (self.operator * v).norm(Infinity)
         elif self.norm_type == "frob":
-            return (self.oper_s * v).norm('frob')
+            return (self.operator * v).norm('frob')
         elif self.norm_type is not None:
             return v.norm(self.norm_type)
         else:
             raise RadixSystemOperatorException("Operator not generated!")
 
     def construct_operator_norm(self, rs):
-        jacobi, self.oper_s = rs.inverseBase.change_ring(QQbar).jordan_form(transformation=True)
+        jacobi, self.operator = rs.inverse_base.change_ring(QQbar).jordan_form(transformation=True)
 
         # Handle non-trivial cases
-        n = self.oper_s.ncols()
+        n = self.operator.ncols()
         i = 0
         while i < n - 1:
             if jacobi[i, i + 1] != 0:
@@ -60,7 +60,7 @@ class RadixSystemOperator(object):
                 # Fill them
                 for k in range(m):
                     jacobi[i + k, i + 1 + k] = mi ^ (m - k - 1)
-                    self.oper_s[i + k] = self.oper_s[i + k] * mi ^ (m - k - 1)
+                    self.operator[i + k] = self.operator[i + k] * mi ^ (m - k - 1)
 
             i = i + 1
 
