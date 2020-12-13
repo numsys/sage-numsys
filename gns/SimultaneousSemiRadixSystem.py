@@ -11,8 +11,8 @@ class SimultaneousDigitSet(RadixSystemDigits):
 
     def get_digit_set(self, rs):
         ret = []
-        print(self.rs_array[0].get_digits())
-        print(self.rs_array[1].get_digits())
+        #print(self.rs_array[0].get_digits())
+        #print(self.rs_array[1].get_digits())
         for d2 in self.rs_array[1].get_digits():
             for d1 in self.rs_array[0].get_digits():
                 #print(self.rs_array[0].get_base(), d2, d1)

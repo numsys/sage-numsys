@@ -5,7 +5,7 @@ from gns import *
 from gns.SimultaneousSemiRadixSystem import SimultaneousSemiRadixSystem
 
 rs =SimultaneousSemiRadixSystem([
-    RadixSystem([[2, -1], [1, 2]],RadixSystemAdjointDigits()),
+    RadixSystem([[2, -1], [1, 2]], RadixSystemAdjointDigits()),
     RadixSystem([[3, -1], [1, 3]], RadixSystemAdjointDigits())
 ])
 
