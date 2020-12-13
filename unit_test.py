@@ -3,6 +3,8 @@ from gns import *
 
 import unittest
 
+from gns.SimultaneousSemiRadixSystem import SimultaneousSemiRadixSystem
+
 
 class RadixSystemTest(unittest.TestCase):
     def setUp(self):
@@ -165,6 +167,19 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': False,
             },
             {
+                'numsys': SimultaneousSemiRadixSystem([
+                    RadixSystem([[2, -1], [1, 2]],RadixSystemAdjointDigits()),
+                    RadixSystem([[3, -1], [1, 3]], RadixSystemAdjointDigits())
+                ]),
+                'assertVariable':
+                {
+                    'digits': [[x[0], x[1], x[0], x[1]] for x in [Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
+                           for d2 in [[0, 0], [1, 0], [-1, -1], [0, -1], [1, -1], [1, 2], [-1, 1], [0, 1], [1, 1], [-1, 0]]
+                           for d1 in [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]]],
+                },
+                'isGNS': False,
+            },
+            {
                 'name' : 'M_A(0,2) ns',
                 'm': Matrix(ZZ, [[0, -2, 0, 0], [2, -2, 0, 0], [0, 0, 1, -2], [0, 0, 2, -1]]),
                 'digits': RadixSystemDigits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [1, 1, 1, 1],
@@ -236,8 +251,7 @@ class RadixSystemTest(unittest.TestCase):
                         {'from': [0, -1, 0, 0],
                          'to': [[0, -1, 0, 0], [-1, -1, 0, 0], [1, 2, 0, 1], [0, -1, 0, 0]]}
                     ],
-            },
-
+            }
         ]
         for it, subject in enumerate(subjects):
             if 'active' in subject and subject['active'] == False:
@@ -248,23 +262,24 @@ class RadixSystemTest(unittest.TestCase):
                 print('Testing case ('+str(it)+')')
                 if 'name' in subject:
                     print(subject['name'])
-                print(subject['m'])
+                if 'm' in subject:
+                    print(subject['m'])
                 # print(subject['digits'].digits)
 
-            if 'operator' in subject:
-                subject['numsys'] = RadixSystem(subject['m'], subject['digits'], operator=subject['operator'])
-            else:
-                subject['numsys'] = RadixSystem(subject['m'], subject['digits'],
-                                                operator=RadixSystemAlwaysExceptionOperator())
+            if 'numsys' not in subject:
+                if 'operator' in subject:
+                    subject['numsys'] = RadixSystem(subject['m'], subject['digits'], operator=subject['operator'])
+                else:
+                    subject['numsys'] = RadixSystem(subject['m'], subject['digits'],
+                                                    operator=RadixSystemAlwaysExceptionOperator())
 
             if self.debug:
-                print(subject['m'])
                 print('digits:')
                 print(subject['numsys'].get_digits())
                 print('Testing phi from digits')
 
             for d in subject['numsys'].get_digits():
-                self.assertEqual(subject['numsys'].phi_function(d), [0 for x in range(subject['m'].nrows())])
+                self.assertEqual(subject['numsys'].phi_function(d), [0 for x in range(subject['numsys'].get_dimension())])
 
             # operator test....
 
