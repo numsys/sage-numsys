@@ -1,6 +1,7 @@
 import itertools
 
 from gns.RadixSystemDigits import *
+from gns.helper.polynom_base import coefficient_string_to_polynom, create_companion_matrix_from_polynom
 from gns.optimization.GeneticSimilarityMatrixOptimizer import *
 from gns.RadixSystemOperator import *
 from gns.optimization.optimizing_tools import *
@@ -456,15 +457,11 @@ class RadixSystem(object):
     def __init__(self, m, digits=None, operator=RadixSystemAlwaysExceptionOperator(), safe_init=False,
                  sparse_mode=False, info_level=0, created_from=None):
 
-        # if isinstance(m,type("")):
-        #    p = coefStringToPolynom(m)
-        #    m = createCompanionMatrixFromPolynom(p)
-        # elif isinstance(m,list):
-        #    m = matrix(m)
-        # elif isinstance(m,Matrix):
-        #    pass
-        # else:
-        #    raise Exception("You can pass m matrix as polynom string, list of list with the values of the matrix, or the Matrix class can be found in PythonMathBase")
+        if isinstance(m,type("")):
+           p = coefficient_string_to_polynom(m)
+           m = create_companion_matrix_from_polynom(p)
+        elif isinstance(m,list):
+           m = matrix(m)
 
         self.sparse_mode = sparse_mode
         self.created_from = created_from
