@@ -2,21 +2,6 @@ from sage.all import *
 from pprint import pprint
 from gns import *
 
-from gns.SimultaneousSemiRadixSystem import SimultaneousSemiRadixSystem
-
-rs =SimultaneousSemiRadixSystem([
-    RadixSystem([[2, -1], [1, 2]], RadixSystemAdjointDigits()),
-    RadixSystem([[3, -1], [1, 3]], RadixSystemAdjointDigits())
-])
-
-pprint(rs.digits)
-d2 =[[x[0], x[1], x[0], x[1]] for x in [Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
-                           for d2 in [[0, 0], [1, 0], [-1, -1], [0, -1], [1, -1], [1, 2], [-1, 1], [0, 1], [1, 1], [-1, 0]]
-                           for d1 in [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]]]
-pprint(d2)
-import sys
-sys.exit(0)
-
 
 print("==== Getting Started ====")
 rs = RadixSystem([[0, -3], [1, 2]], [[0, 0], [1, 0], [2, 0]])
