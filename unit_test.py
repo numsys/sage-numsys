@@ -225,7 +225,7 @@ class RadixSystemTest(unittest.TestCase):
                     ],
             },
             {
-                'active': True,
+                'active': False,
                 'name': 'M_B(-1,1) simultaneous rs',
                 'm': Matrix(ZZ, [[-1, -1, 0, 0], [1, -1, 0, 0], [0, 0, -1, -2], [0, 0, 2, -1]]),
                 'digits': DenseDigits(),
