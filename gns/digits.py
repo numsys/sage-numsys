@@ -98,9 +98,9 @@ class AdjointDigits(Digits):
             if i == [0] * rs.dimension:
                 bs.append(i)
             else:
-                bs.append([x / rs.determinant for x in rs.get_base() * vector(self.get_adjoint_congruent_class(i,rs))])
+                bs.append([x / rs.determinant for x in rs.get_base() * vector(self.get_congruent_element(i,rs))])
         return bs
-    def get_adjoint_congruent_class(self, v, rs):
+    def get_congruent_element(self, v, rs):
         """
         Computes the congruent class of a given vector v using the Adjoint method
         """
