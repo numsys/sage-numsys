@@ -51,6 +51,8 @@ print(optimizePhiT)
 print("New base for phi optimized")
 print(optimizedPhi.get_base())
 
+
+import random
 optVolPoints = optimizedVol.get_points_in_box()
 for i in range(3):
     print("Get point from vol optimized:")
