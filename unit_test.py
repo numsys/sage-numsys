@@ -19,17 +19,17 @@ class RadixSystemTest(unittest.TestCase):
         with self.assertRaises(ExpansivityException):
             m = Matrix(ZZ, [[0, -1], [1, 2]])
             digits = [[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]]
-            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
+            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator(), check_expansivity_property=True)
 
         with self.assertRaises(FullResidueSystemException):
             m = Matrix(ZZ, [[1, -3], [1, 2]])
             digits = [[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]]
-            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
+            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator(), check_crs_property=True)
 
         with self.assertRaises(UnitConditionException):
             m = Matrix(ZZ, [[0, 2], [1, 0]])
             digits = [[0, 0], [1, 0]]
-            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
+            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator(), check_unit_condition=True)
 
     def test_phi_test(self):
         subjects = [

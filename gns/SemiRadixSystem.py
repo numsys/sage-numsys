@@ -1,60 +1,13 @@
 import itertools
 
-from gns.Digits import *
+from gns.digits import *
+from gns.exceptions import *
+from gns.helper.matrix_sparse_dense_converting import to_sparse, to_dense
 from gns.helper.polynom_base import coefficient_string_to_polynom, create_companion_matrix_from_polynom
 from gns.optimization.GeneticSimilarityMatrixOptimizer import *
 from gns.Operator import *
 from gns.optimization.optimizing_tools import *
 import random
-
-class FullResidueSystemException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-class ExpansivityException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-class UnitConditionException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-class RegularityException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-class OptimizationFailed(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-class SmartDecideTimeout(Exception):
-    def __init__(self, value):
-        self.value = value
-
-
-
-def to_sparse(m):
-    return m
-
-
-#    if m.is_sparse():
-#        return m
-#    else:
-#        return MatrixSpace(m.base_ring(),m.nrows(),sparse=True)(m)
-
-def to_dense(m):
-    return m
-
-
-#    if m.is_dense():
-#        return m
-#    else: 
-#        return MatrixSpace(m.base_ring(),m.nrows(),sparse=False)(m)
 
 
 class SemiRadixSystem(object):
@@ -445,8 +398,9 @@ class SemiRadixSystem(object):
             self.digitsHash.append(self.digits[digits_list.index(i)])
         return True
 
-    def __init__(self, m, digits=None, operator=AlwaysExceptionOperator(), safe_init=False,
-                 sparse_mode=False, info_level=0, created_from=None):
+    def __init__(self, m, digits=None, operator=AlwaysExceptionOperator(),
+                 sparse_mode=False, created_from=None, check_unit_condition=False,
+                 check_crs_property=False, check_expansivity_property=False):
 
         if isinstance(m,type("")):
            p = coefficient_string_to_polynom(m)
@@ -471,10 +425,10 @@ class SemiRadixSystem(object):
         if self.abs_determinant == 0:
             raise RegularityException("The operator must be regular")
 
-        if self.check_unit_condition() == False:
+        if check_unit_condition and self.check_unit_condition() == False:
             raise UnitConditionException("abs(det(M-I)) must be greater than one")
 
-        if self.check_expansivity() == False:
+        if check_expansivity_property and self.check_expansivity() == False:
             raise ExpansivityException("The operator must be expansive")
 
         self.adjoint_m = self.base.adjugate()
