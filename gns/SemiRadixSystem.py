@@ -67,7 +67,7 @@ class SemiRadixSystem(object):
 
         while x.norm(Infinity) >= eps:
             x = x * self.inverse_base
-            multiplied_digits = [x * vector(i) for i in self.digits]
+            multiplied_digits = [x * vector(i) for i in self.get_digits()]
 
             for i in range(self.dimension):
                 y = 0
@@ -210,12 +210,12 @@ class SemiRadixSystem(object):
                 return True
         else:
             def construct_set_e():
-                e = {d for d in [tuple(x) for x in self.digits]}
+                e = {d for d in [tuple(x) for x in self.get_digits()]}
                 e2 = {}
                 while e != e2:
                     e2 = {x for x in e}
                     for e in e2:
-                        for d in self.digits:
+                        for d in self.get_digits():
                             e.add(tuple(self.phi_function(vector(e) + vector(d))))
                 return e
 
@@ -325,7 +325,7 @@ class SemiRadixSystem(object):
             counter = counter + 1
 
     def norm(self, v):
-        return self.operator.norm(v)
+        return self.get_operator().norm(v)
 
     def optimize(self, cand_num=10, num_of_candidate_to_mutate=10, mutate_num=1,
                  iterate_num=10, target_function=None, recombination=0, return_transformation_also=False, debug=False,
@@ -340,8 +340,8 @@ class SemiRadixSystem(object):
             target_function = calculate_volume
 
         # Prepare data for optimizing
-        #        crs = matrix([vector(digit) for digit in self.digits],sparse=self.sparseMode).transpose()
-        crs = matrix([vector(digit) for digit in self.digits]).transpose()
+        #        crs = matrix([vector(digit) for digit in self.get_digits()],sparse=self.sparseMode).transpose()
+        crs = matrix([vector(digit) for digit in self.get_digits()]).transpose()
         start_val = (
             self.base.inverse(), crs, target_function((self.base.inverse(), crs), matrix.identity(self.base.nrows())))
 
@@ -351,10 +351,10 @@ class SemiRadixSystem(object):
 
         # Construct the new radix system parameters
         # new_m = MatrixSpace(self.base.base_ring(),self.base.nrows(),sparse=self.sparseMode)(candidate[0] * self.base * candidate[0].inverse())
-        # new_digits = [(matrix(candidate[0],sparse=self.sparseMode) * vector(d)).list() for d in self.digits]
+        # new_digits = [(matrix(candidate[0],sparse=self.sparseMode) * vector(d)).list() for d in self.get_digits()]
         new_m = MatrixSpace(self.base.base_ring(), self.base.nrows(), self.base.ncols(), True, None)(
             matrix(candidate[0]) * self.base * matrix(candidate[0]).inverse())
-        new_digits = [(matrix(candidate[0]) * vector(d)).list() for d in self.digits]
+        new_digits = [(matrix(candidate[0]) * vector(d)).list() for d in self.get_digits()]
 
         if return_transformation_also:
             return (SemiRadixSystem(new_m, new_digits, operator=AlwaysExceptionOperator()),
@@ -375,19 +375,23 @@ class SemiRadixSystem(object):
         return True
 
     def check_crs_property_and_build_digits_hashes(self):
-        if len(self.digits) != self.abs_determinant:
+        if len(self.get_digits()) != self.abs_determinant:
             raise FullResidueSystemException(
                 "The digit set must be a full residue system, it should have |det(M)| elements...")
         digits_list = []
-        self.digitsHash = []
-        for v in self.digits:
+        self.digits_hash = []
+        digits = self.get_digits()
+
+        smith_diagonal = self.get_smith_diagonal_list()
+        smith_u = self.get_smith_u()
+        for v in digits:
             res = 0
             i = self.dimension - 1
-            while i >= 0 and self.smith_diagonal[i] > 1:
+            while i >= 0 and smith_diagonal[i] > 1:
                 s = 0
                 for j in range(self.dimension):
-                    s = s + (self.smith_u[i, j] * v[j] % self.smith_diagonal[i])
-                res = res * self.smith_diagonal[i] + (s % self.smith_diagonal[i])
+                    s = s + (smith_u[i, j] * v[j] % smith_diagonal[i])
+                res = res * smith_diagonal[i] + (s % smith_diagonal[i])
                 i = i - 1
             if res in digits_list:
                 raise FullResidueSystemException(
@@ -395,11 +399,11 @@ class SemiRadixSystem(object):
             else:
                 digits_list.append(res)
         for i in range(len(digits_list)):
-            self.digitsHash.append(self.digits[digits_list.index(i)])
+            self.digits_hash.append(digits[digits_list.index(i)])
         return True
 
-    def __init__(self, m, digits=None, operator=AlwaysExceptionOperator(),
-                 sparse_mode=False, created_from=None, check_unit_condition=False,
+    def __init__(self, m, digits=None, operator=None,
+                 sparse_mode=False, check_unit_condition=False,
                  check_crs_property=False, check_expansivity_property=False):
 
         if isinstance(m,type("")):
@@ -409,7 +413,6 @@ class SemiRadixSystem(object):
            m = matrix(m)
 
         self.sparse_mode = sparse_mode
-        self.created_from = created_from
 
         if isinstance(m,list):
             m = Matrix(ZZ, len(m), m)
@@ -425,35 +428,20 @@ class SemiRadixSystem(object):
         if self.abs_determinant == 0:
             raise RegularityException("The operator must be regular")
 
+        self.dimension = self.base.nrows()
+        self.inverse_base = self.base.inverse()
+
+
         if check_unit_condition and self.check_unit_condition() == False:
             raise UnitConditionException("abs(det(M-I)) must be greater than one")
 
         if check_expansivity_property and self.check_expansivity() == False:
             raise ExpansivityException("The operator must be expansive")
 
-        self.adjoint_m = self.base.adjugate()
-
-        self.dimension = self.base.nrows()
-        self.inverse_base = self.base.inverse()
-
-        self.sm, self.smith_u, smV = to_dense(self.base).smith_form()
-
-        if self.sparse_mode:
-            self.sm = to_sparse(self.sm)
-            self.smith_u = to_sparse(self.smith_u)
-
-        self.smith_diagonal = [self.sm[i, i] for i in range(self.sm.nrows())]
-        self.dense_inverse_m = to_dense(self.inverse_base)
-
-        self.low_box = [0] * self.dimension
-        self.up_box = [0] * self.dimension
-
         if operator is None:
-            self.operator = Operator()
+            self.operator = AlwaysExceptionOperator()
         else:
             self.operator = operator
-
-        self.operator.init_operator(self)
 
         if digits is None:
             self.digit_object = CanonicalDigits()
@@ -461,32 +449,52 @@ class SemiRadixSystem(object):
             self.digit_object = Digits(digits)
         else:
             self.digit_object = digits
-        self.digits = self.digit_object.get_digit_set(self)
 
-        self.check_crs_property_and_build_digits_hashes()
+        if check_crs_property:
+            self.check_crs_property_and_build_digits_hashes()
 
     def get_base(self):
         return self.base
+
+    def get_inverse_base(self):
+        return self.inverse_base
 
     def get_operator_inverse(self):
         return self.inverse_base
 
     def get_digits(self):
+        if not hasattr(self,'digits'):
+            self.digits = self.digit_object.get_digit_set(self)
         return self.digits
 
-    def get_smith_diag(self):
-        return self.smith_diagonal
+    def get_digit_hash(self):
+        if not hasattr(self,'digit_hash'):
+            self.check_crs_property_and_build_digits_hashes()
+        return self.digits_hash
+
+    def calculate_smith_form(self):
+        self.smith_d, self.smith_u, self.smith_v = to_dense(self.base).smith_form()
+        if self.sparse_mode:
+            self.smith_d = to_sparse(self.smith_d)
+            self.smith_u = to_sparse(self.smith_u)
+            self.smith_v = to_sparse(self.smith_v)
+
+        self.smith_diagonal_list = [self.smith_d[i, i] for i in range(self.smith_d.nrows())]
+
+    def get_smith_diagonal_list(self):
+        if not hasattr(self, 'smith_diagonal'):
+            self.calculate_smith_form()
+        return self.smith_diagonal_list
 
     def get_smith_u(self):
+        if not hasattr(self, 'smith_u'):
+            self.calculate_smith_form()
         return self.smith_u
 
     def get_dimension(self):
         return self.dimension
 
-    def debug_info(self):
-        print("Base:", self.base)
-        print("Digit set:", self.digits)
-        print("Dimension:", self.dimension)
-        print("Determinant:", self.determinant)
-        print("Smith U:", self.smith_u)
-        print("Smith diagonal:", self.smith_diagonal)
+    def get_operator(self):
+        if not hasattr(self, 'operator'):
+            self.operator.init_operator(self)
+        return self.operator

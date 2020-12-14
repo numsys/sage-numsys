@@ -1,5 +1,7 @@
 from sage.all import *
 
+from .helper.matrix_sparse_dense_converting import to_dense
+
 
 class OperatorException(Exception):
     def __init__(self, value):
@@ -18,11 +20,13 @@ class Operator(object):
         self.norm_type = norm_type
 
     def init_operator(self, rs):
-        if (self.norm_type == Infinity or self.norm_type is None) and rs.dense_inverse_m.norm(Infinity) < 1:
+
+        dense_inverse_m = to_dense(rs.get_base())
+        if (self.norm_type == Infinity or self.norm_type is None) and dense_inverse_m.norm(Infinity) < 1:
             self.norm_type = Infinity
-        elif (self.norm_type == 1 or self.norm_type is None) and rs.dense_inverse_m.norm(1) < 1:
+        elif (self.norm_type == 1 or self.norm_type is None) and dense_inverse_m.norm(1) < 1:
             self.norm_type = 1
-        elif (self.norm_type == 2 or self.norm_type is None) and rs.dense_inverse_m.norm(2) < 1:
+        elif (self.norm_type == 2 or self.norm_type is None) and dense_inverse_m.norm(2) < 1:
             self.norm_type = 2
         elif self.norm_type == "jacobi" or self.norm_type is None:
             self.norm_type = "jacobi"
@@ -41,7 +45,7 @@ class Operator(object):
             raise OperatorException("Operator not generated!")
 
     def construct_operator_norm(self, rs):
-        jacobi, self.operator = rs.inverse_base.change_ring(QQbar).jordan_form(transformation=True)
+        jacobi, self.operator = rs.get_inverse_base().change_ring(QQbar).jordan_form(transformation=True)
 
         # Handle non-trivial cases
         n = self.operator.ncols()

@@ -1,6 +1,5 @@
 from sage.matrix.matrix_space import MatrixSpace
 
-
 def to_sparse(m):
     if m.is_sparse():
         return m

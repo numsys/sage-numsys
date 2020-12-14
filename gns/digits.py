@@ -18,13 +18,15 @@ class Digits(object):
         """
         res = 0
         i = rs.dimension - 1
-        while i >= 0 and rs.smith_diagonal[i] > 1:
+        smith_diagonal = rs.get_smith_diagonal_list()
+        smith_u = rs.get_smith_u()
+        while i >= 0 and smith_diagonal[i] > 1:
             s = 0
             for j in range(rs.dimension):
-                s = s + rs.smith_u[i, j] * v[j]
-            res = res * rs.smith_diagonal[i] + (s % rs.smith_diagonal[i])
+                s = s + smith_u[i, j] * v[j]
+            res = res * smith_diagonal[i] + (s % smith_diagonal[i])
             i = i - 1
-        return rs.digitsHash[res]
+        return rs.get_digit_hash()[res]
 
     def __init__(self, digits=None):
         self.digits = digits
@@ -71,7 +73,10 @@ class ShiftedCanonicalDigits(Digits):
 class AdjointDigits(Digits):
     def get_digit_set(self, rs):
         # first generating a complete residue system to cr_set
-        insm_u = rs.smith_u.inverse()
+        smith_u = rs.get_smith_u()
+        smith_diagonal = rs.get_smith_diagonal_list()
+
+        insm_u = smith_u.inverse()
         cr_set = []
         v = [0] * rs.dimension
         j = 0
@@ -79,7 +84,7 @@ class AdjointDigits(Digits):
         while finished == 0 and j < rs.abs_determinant:
             cr_set.append((insm_u * vector(v)).list())
             i = rs.dimension - 1
-            while i >= 0 and v[i] == rs.smith_diagonal[i] - 1:
+            while i >= 0 and v[i] == smith_diagonal[i] - 1:
                 v[i] = 0
                 i = i - 1
             if i >= 0:
@@ -93,7 +98,7 @@ class AdjointDigits(Digits):
             if i == [0] * rs.dimension:
                 bs.append(i)
             else:
-                bs.append([x / rs.determinant for x in rs.base * vector(self.get_adjoint_congruent_class(i,rs))])
+                bs.append([x / rs.determinant for x in rs.get_base() * vector(self.get_adjoint_congruent_class(i,rs))])
         return bs
     def get_adjoint_congruent_class(self, v, rs):
         """
@@ -101,6 +106,9 @@ class AdjointDigits(Digits):
         """
         def get_symmetric_modulo(num, mod):
             return Mod(num, mod).lift_centered()
+
+        if not hasattr(rs,'adjoint_m'):
+            rs.adjoint_m = rs.get_base().adjugate()
 
         v1 = []
         for i in range(rs.dimension):

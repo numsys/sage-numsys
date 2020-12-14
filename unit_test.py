@@ -14,7 +14,7 @@ class RadixSystemTest(unittest.TestCase):
         with self.assertRaises(FullResidueSystemException):
             m = Matrix(ZZ, [[2, -1], [1, 2]])
             digits = [[0, 0], [1, 0], [0, 1], [0, -1]]
-            ns1 = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
+            ns1 = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator(), check_crs_property=True)
 
         with self.assertRaises(ExpansivityException):
             m = Matrix(ZZ, [[0, -1], [1, 2]])
