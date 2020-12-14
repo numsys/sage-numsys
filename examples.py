@@ -4,19 +4,19 @@ from gns import *
 
 
 print("==== Getting Started ====")
-rs = RadixSystem([[0, -3], [1, 2]], [[0, 0], [1, 0], [2, 0]])
+rs = SemiRadixSystem([[0, -3], [1, 2]], [[0, 0], [1, 0], [2, 0]])
 print(rs.is_gns())
 
 print("==== Digit Generators ====")
-rs = RadixSystem([[0, -7], [1, -7]], RadixSystemCanonicalDigits())
+rs = SemiRadixSystem([[0, -7], [1, -7]], CanonicalDigits())
 print(rs.get_digits(), rs.is_gns())
 
-rs = RadixSystem([[0, -7], [1, -7]], RadixSystemSymmetricDigits())
+rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
 print(rs.get_digits(), rs.is_gns())
 
 print("==== Phi function ====")
 
-rs = RadixSystem([[0, -7], [1, -7]], RadixSystemSymmetricDigits())
+rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
 print(rs.phi_function([2, 3]))
 print(rs.get_orbit_from([6, 3]))
 
@@ -67,8 +67,8 @@ for i in range(3):
     print(optimizedPhi.get_orbit_from(newPoint))
 
 print("==== Drawing ====")
-rs = RadixSystem([[0, -3], [1, 2]], RadixSystemCanonicalDigits())
-dr = RadixSystemDrawer()
+rs = SemiRadixSystem([[0, -3], [1, 2]], CanonicalDigits())
+dr = Drawer()
 g = dr.get_phi_orbit_graph(rs)
 g.save("test.svg", figsize=16)
 # g.show()

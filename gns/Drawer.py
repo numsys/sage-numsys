@@ -2,7 +2,7 @@ from sage.all import *
 
 import collections
 
-from gns.RadixSystem import RadixSystem
+from gns.SemiRadixSystem import SemiRadixSystem
 
 
 def update(d, u):
@@ -15,7 +15,7 @@ def update(d, u):
     return d
 
 
-class RadixSystemDrawer:
+class Drawer:
     def __init__(self):
         pass
 
@@ -53,7 +53,7 @@ class RadixSystemDrawer:
                     p += arrow(cycle[i], cycle[i + 1], color=color)
         return p
 
-    def get_phi_arrows_plot(self, rs: RadixSystem):
+    def get_phi_arrows_plot(self, rs: SemiRadixSystem):
         p = Graphics()
         act = rs.get_points_in_box_start_val()
         while not act["finished"]:

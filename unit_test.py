@@ -3,7 +3,7 @@ from gns import *
 
 import unittest
 
-from gns.SimultaneousSemiRadixSystem import SimultaneousSemiRadixSystem
+from gns.SimultaneousSystem import SimultaneousSystem
 
 
 class RadixSystemTest(unittest.TestCase):
@@ -11,31 +11,31 @@ class RadixSystemTest(unittest.TestCase):
         self.debug = True
 
     def test_necessary_exception(self):
-        with self.assertRaises(RadixSystemFullResidueSystemException):
+        with self.assertRaises(FullResidueSystemException):
             m = Matrix(ZZ, [[2, -1], [1, 2]])
             digits = [[0, 0], [1, 0], [0, 1], [0, -1]]
-            ns1 = RadixSystem(m, digits, operator=RadixSystemAlwaysExceptionOperator())
+            ns1 = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
 
-        with self.assertRaises(RadixSystemExpansivityException):
+        with self.assertRaises(ExpansivityException):
             m = Matrix(ZZ, [[0, -1], [1, 2]])
             digits = [[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]]
-            ns = RadixSystem(m, digits, operator=RadixSystemAlwaysExceptionOperator())
+            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
 
-        with self.assertRaises(RadixSystemFullResidueSystemException):
+        with self.assertRaises(FullResidueSystemException):
             m = Matrix(ZZ, [[1, -3], [1, 2]])
             digits = [[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]]
-            ns = RadixSystem(m, digits, operator=RadixSystemAlwaysExceptionOperator())
+            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
 
-        with self.assertRaises(RadixSystemUnitConditionException):
+        with self.assertRaises(UnitConditionException):
             m = Matrix(ZZ, [[0, 2], [1, 0]])
             digits = [[0, 0], [1, 0]]
-            ns = RadixSystem(m, digits, operator=RadixSystemAlwaysExceptionOperator())
+            ns = SemiRadixSystem(m, digits, operator=AlwaysExceptionOperator())
 
     def test_phi_test(self):
         subjects = [
             {
                 'm': Matrix(ZZ, [[2, -1], [1, 2]]),
-                'digits': RadixSystemDigits([[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]]),
+                'digits': Digits([[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]]),
                 'phiTests':
                     [
                         {'from': [-6, 5], 'to': [0, 0]},
@@ -50,7 +50,7 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[1, -2], [1, 1]]),
-                'digits': RadixSystemDigits([[0, 0], [1, 0], [-1, 0]]),
+                'digits': Digits([[0, 0], [1, 0], [-1, 0]]),
                 'phiTests':
                     [
                         {'from': [3, 2], 'to': [2, 0]},
@@ -65,7 +65,7 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[1, -2], [1, 1]]),
-                'digits': RadixSystemSymmetricDigits(),
+                'digits': SymmetricDigits(),
                 'phiTests':
                     [
                         {'from': [3, 2], 'to': [2, 0]},
@@ -80,7 +80,7 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[-1, -1], [1, -1]]),
-                'digits': RadixSystemDigits([[0, 0], [1, 0]]),
+                'digits': Digits([[0, 0], [1, 0]]),
                 'phiTests':
                     [
                         {'from': [3, 2], 'to': [0, -2]},
@@ -97,7 +97,7 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[0, -2], [1, -2]]),
-                'digits': RadixSystemCanonicalDigits(),
+                'digits': CanonicalDigits(),
                 'orbitTests':
                     [
                         {'from': [2, 1], 'to': [[2, 1], [-1, -1], [1, 1], [1, 0], [0, 0], [0, 0]]}
@@ -110,7 +110,7 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[3]]),
-                'digits': RadixSystemDigits([[-2], [0], [2]]),
+                'digits': Digits([[-2], [0], [2]]),
                 'phiTests':
                     [
                         {'from': [1], 'to': [1]},
@@ -126,7 +126,7 @@ class RadixSystemTest(unittest.TestCase):
             {
                 'name': '4 dimension constans base and digits',
                 'm': Matrix(ZZ, [[0, 0, 0, 0, -7], [1, 0, 0, 0, 6], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 1, 0]]),
-                'digits': RadixSystemCanonicalDigits(),
+                'digits': CanonicalDigits(),
                 'assertVariable':
                     {
                         'digits': [[0, 0, 0, 0, 0], [1, 0, 0, 0, 0], [2, 0, 0, 0, 0], [3, 0, 0, 0, 0], [4, 0, 0, 0, 0],
@@ -142,7 +142,7 @@ class RadixSystemTest(unittest.TestCase):
             {
                 'name': 'Adjoint digits test',
                 'm': Matrix(ZZ, [[2, -1], [1, 2]]),
-                'digits': RadixSystemAdjointDigits(),
+                'digits': AdjointDigits(),
                 'isGNS': True,
                 'assertVariable':
                     {
@@ -151,7 +151,7 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[3, -1], [1, 3]]),
-                'digits': RadixSystemAdjointDigits(),
+                'digits': AdjointDigits(),
                 'isGNS': True,
                 'assertVariable':
                     {
@@ -167,9 +167,9 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': False,
             },
             {
-                'numsys': SimultaneousSemiRadixSystem([
-                    RadixSystem([[2, -1], [1, 2]],RadixSystemAdjointDigits()),
-                    RadixSystem([[3, -1], [1, 3]], RadixSystemAdjointDigits())
+                'numsys': SimultaneousSystem([
+                    SemiRadixSystem([[2, -1], [1, 2]], AdjointDigits()),
+                    SemiRadixSystem([[3, -1], [1, 3]], AdjointDigits())
                 ]),
                 'assertVariable':
                 {
@@ -182,34 +182,34 @@ class RadixSystemTest(unittest.TestCase):
             {
                 'name' : 'M_A(0,2) ns',
                 'm': Matrix(ZZ, [[0, -2, 0, 0], [2, -2, 0, 0], [0, 0, 1, -2], [0, 0, 2, -1]]),
-                'digits': RadixSystemDigits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [1, 1, 1, 1],
-                                             [-1, 0, -1, 0], [-2, 0, -2, 0], [-1, -1, -1, -1], [-2, -1, -2, -1],
-                                             [2, -1, 2, -1],
-                                             [-2, 1, -2, 1], [-1, -2, -1, -2], [-3, -3, -3, -3]]),
+                'digits': Digits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [1, 1, 1, 1],
+                                  [-1, 0, -1, 0], [-2, 0, -2, 0], [-1, -1, -1, -1], [-2, -1, -2, -1],
+                                  [2, -1, 2, -1],
+                                  [-2, 1, -2, 1], [-1, -2, -1, -2], [-3, -3, -3, -3]]),
                 'isGNS': True,
             },
             {
                 'name': 'M_A(1,2) ns',
                 'm': Matrix(ZZ, [[1, -2, 0, 0], [2, -1, 0, 0], [0, 0, 2, -2], [0, 0, 2, 0]]),
-                'digits': RadixSystemDigits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [1, 1, 1, 1],
-                                             [-1, 0, -1, 0], [1, -1, 1, -1], [0, -1, 0, -1], [-2, 0, -2, 0],
-                                             [-1, -1, -1, -1], [2, -1, 2, -1], [-1, -2, -1, -2], [0, -3, 0, -3]]),
+                'digits': Digits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [1, 1, 1, 1],
+                                  [-1, 0, -1, 0], [1, -1, 1, -1], [0, -1, 0, -1], [-2, 0, -2, 0],
+                                  [-1, -1, -1, -1], [2, -1, 2, -1], [-1, -2, -1, -2], [0, -3, 0, -3]]),
                 'isGNS': True,
             },
             {
                 'name' : 'M_B(-2,-1)',
                 'm': Matrix(ZZ, [[-2, 1, 0, 0], [-1, -1, 0, 0], [0, 0, -2, -2], [0, 0, 0, -2]]),
-                'digits': RadixSystemDigits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [0, 1, 0, 1],
-                                             [-2, 1, -2, 1], [1, -2, 1, -2], [-3, -1, -3, -1], [-2, 0, 0, -2],
-                                             [-1, -1, -1, -1], [-2, -1, -2, -1], [-1, -2, -1, -2], [-3, -3, -3, -3]]),
+                'digits': Digits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [0, 1, 0, 1],
+                                  [-2, 1, -2, 1], [1, -2, 1, -2], [-3, -1, -3, -1], [-2, 0, 0, -2],
+                                  [-1, -1, -1, -1], [-2, -1, -2, -1], [-1, -2, -1, -2], [-3, -3, -3, -3]]),
                 'isGNS': True,
             },
             {
                 'active': False,
                 'name': 'M_A(1,1) simultaneous rs',
                 'm': Matrix(ZZ, [[1, -1, 0, 0], [1, 1, 0, 0], [0, 0, 2, -1], [0, 0, 1, 2]]),
-                'digits': RadixSystemDenseDigits(),
-                'operator': RadixSystemOperator('jacobi'),
+                'digits': DenseDigits(),
+                'operator': Operator('jacobi'),
                 'assertVariable':
                     {
                         'digits': [[0, 0, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 1, 1],
@@ -228,8 +228,8 @@ class RadixSystemTest(unittest.TestCase):
                 'active': False,
                 'name': 'M_B(-1,1) simultaneous rs',
                 'm': Matrix(ZZ, [[-1, -1, 0, 0], [1, -1, 0, 0], [0, 0, -1, -2], [0, 0, 2, -1]]),
-                'digits': RadixSystemDenseDigits(),
-                'operator': RadixSystemOperator('jacobi'),
+                'digits': DenseDigits(),
+                'operator': Operator('jacobi'),
                 'assertVariable':
                     {
                         'digits': [[0, 0, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 1, 1],
@@ -268,10 +268,10 @@ class RadixSystemTest(unittest.TestCase):
 
             if 'numsys' not in subject:
                 if 'operator' in subject:
-                    subject['numsys'] = RadixSystem(subject['m'], subject['digits'], operator=subject['operator'])
+                    subject['numsys'] = SemiRadixSystem(subject['m'], subject['digits'], operator=subject['operator'])
                 else:
-                    subject['numsys'] = RadixSystem(subject['m'], subject['digits'],
-                                                    operator=RadixSystemAlwaysExceptionOperator())
+                    subject['numsys'] = SemiRadixSystem(subject['m'], subject['digits'],
+                                                        operator=AlwaysExceptionOperator())
 
             if self.debug:
                 print('digits:')
@@ -311,12 +311,12 @@ class RadixSystemTest(unittest.TestCase):
                 self.assertEqual(subject['numsys'].is_gns(), subject['isGNS'])
 
     def test_simple_optimization(self):
-        rs = RadixSystem([[0, -7], [1, -7]], RadixSystemSymmetricDigits())
+        rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
 
         optimized_vol = rs.optimize()
         self.assertFalse(optimized_vol.decide_gns())
 
-        rs = RadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
+        rs = SemiRadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         optimized_vol = rs.optimize()
         self.assertTrue(optimized_vol.decide_gns())
 
@@ -334,17 +334,17 @@ class RadixSystemTest(unittest.TestCase):
                                         point_transform=transform_matrix)
 
     def test_two_step_optimization(self):
-        rs = RadixSystem([[0, -7], [1, -7]], RadixSystemSymmetricDigits())
+        rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
         self.assertFalse(self.two_step_optimization(rs))
 
-        rs = RadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
+        rs = SemiRadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         self.assertTrue(self.two_step_optimization(rs))
 
     def test_smart_decide(self):
-        rs = RadixSystem([[0, -7], [1, -7]], RadixSystemSymmetricDigits())
+        rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
         self.assertFalse(rs.smart_decide())
 
-        rs = RadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
+        rs = SemiRadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         self.assertTrue(rs.smart_decide())
 
 

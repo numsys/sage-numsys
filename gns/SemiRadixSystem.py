@@ -1,47 +1,38 @@
 import itertools
 
-from gns.RadixSystemDigits import *
+from gns.Digits import *
 from gns.helper.polynom_base import coefficient_string_to_polynom, create_companion_matrix_from_polynom
 from gns.optimization.GeneticSimilarityMatrixOptimizer import *
-from gns.RadixSystemOperator import *
+from gns.Operator import *
 from gns.optimization.optimizing_tools import *
 import random
 
-
-class RadixSystemException(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
-
-
-class RadixSystemFullResidueSystemException(RadixSystemException):
+class FullResidueSystemException(Exception):
     def __init__(self, value):
         self.value = value
 
 
-class RadixSystemExpansivityException(RadixSystemException):
+class ExpansivityException(Exception):
     def __init__(self, value):
         self.value = value
 
 
-class RadixSystemUnitConditionException(RadixSystemException):
+class UnitConditionException(Exception):
     def __init__(self, value):
         self.value = value
 
 
-class RadixSystemRegularityException(RadixSystemException):
+class RegularityException(Exception):
     def __init__(self, value):
         self.value = value
 
 
-class RadixSystemOptimizationFailed(RadixSystemException):
+class OptimizationFailed(Exception):
     def __init__(self, value):
         self.value = value
 
 
-class RadixSystemSmartDecideTimeout(RadixSystemException):
+class SmartDecideTimeout(Exception):
     def __init__(self, value):
         self.value = value
 
@@ -66,7 +57,7 @@ def to_dense(m):
 #        return MatrixSpace(m.base_ring(),m.nrows(),sparse=False)(m)
 
 
-class RadixSystem(object):
+class SemiRadixSystem(object):
     def phi_function(self, v):
         """
         Computes the Phi function for a given point v
@@ -340,7 +331,7 @@ class RadixSystem(object):
         if estimated_decide_time < optimal_runtime:
             return optimized_phi.decide_gns(start_point_source=optimized_vol, point_transform=transform_matrix)
 
-        raise RadixSystemSmartDecideTimeout("Too big case")
+        raise SmartDecideTimeout("Too big case")
 
     def find_n_length_cycle(self, n):
         left_matrix = (matrix.identity(self.get_dimension()) - self.get_base() ** n).inverse()
@@ -390,7 +381,7 @@ class RadixSystem(object):
         optimizer = GeneticSimilarityMatrixOptimizer()
 
         if self.dimension == 1:
-            raise RadixSystemOptimizationFailed("Can't optimize 1 sized matrix!")
+            raise OptimizationFailed("Can't optimize 1 sized matrix!")
 
         if target_function is None:
             target_function = calculate_volume
@@ -413,10 +404,10 @@ class RadixSystem(object):
         new_digits = [(matrix(candidate[0]) * vector(d)).list() for d in self.digits]
 
         if return_transformation_also:
-            return (RadixSystem(new_m, new_digits, operator=RadixSystemAlwaysExceptionOperator()),
+            return (SemiRadixSystem(new_m, new_digits, operator=AlwaysExceptionOperator()),
                     MatrixSpace(self.base.base_ring(), self.base.nrows(), self.base.ncols(), True, None)(candidate[0]))
         else:
-            return RadixSystem(new_m, new_digits, operator=RadixSystemAlwaysExceptionOperator())
+            return SemiRadixSystem(new_m, new_digits, operator=AlwaysExceptionOperator())
 
     def check_expansivity(self):
         for i in [abs(p) for p in self.base.eigenvalues()]:
@@ -432,7 +423,7 @@ class RadixSystem(object):
 
     def check_crs_property_and_build_digits_hashes(self):
         if len(self.digits) != self.abs_determinant:
-            raise RadixSystemFullResidueSystemException(
+            raise FullResidueSystemException(
                 "The digit set must be a full residue system, it should have |det(M)| elements...")
         digits_list = []
         self.digitsHash = []
@@ -446,7 +437,7 @@ class RadixSystem(object):
                 res = res * self.smith_diagonal[i] + (s % self.smith_diagonal[i])
                 i = i - 1
             if res in digits_list:
-                raise RadixSystemFullResidueSystemException(
+                raise FullResidueSystemException(
                     "The digit set must be a full residue system, there are congruent elements...")
             else:
                 digits_list.append(res)
@@ -454,7 +445,7 @@ class RadixSystem(object):
             self.digitsHash.append(self.digits[digits_list.index(i)])
         return True
 
-    def __init__(self, m, digits=None, operator=RadixSystemAlwaysExceptionOperator(), safe_init=False,
+    def __init__(self, m, digits=None, operator=AlwaysExceptionOperator(), safe_init=False,
                  sparse_mode=False, info_level=0, created_from=None):
 
         if isinstance(m,type("")):
@@ -478,13 +469,13 @@ class RadixSystem(object):
         self.abs_determinant = abs(self.determinant)
 
         if self.abs_determinant == 0:
-            raise RadixSystemRegularityException("The operator must be regular")
+            raise RegularityException("The operator must be regular")
 
         if self.check_unit_condition() == False:
-            raise RadixSystemUnitConditionException("abs(det(M-I)) must be greater than one")
+            raise UnitConditionException("abs(det(M-I)) must be greater than one")
 
         if self.check_expansivity() == False:
-            raise RadixSystemExpansivityException("The operator must be expansive")
+            raise ExpansivityException("The operator must be expansive")
 
         self.adjoint_m = self.base.adjugate()
 
@@ -504,16 +495,16 @@ class RadixSystem(object):
         self.up_box = [0] * self.dimension
 
         if operator is None:
-            self.operator = RadixSystemOperator()
+            self.operator = Operator()
         else:
             self.operator = operator
 
         self.operator.init_operator(self)
 
         if digits is None:
-            self.digit_object = RadixSystemCanonicalDigits()
+            self.digit_object = CanonicalDigits()
         elif isinstance(digits, list):
-            self.digit_object = RadixSystemDigits(digits)
+            self.digit_object = Digits(digits)
         else:
             self.digit_object = digits
         self.digits = self.digit_object.get_digit_set(self)

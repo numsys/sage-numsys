@@ -3,7 +3,7 @@ from sage.all import *
 from math import floor
 
 
-class RadixSystemDigitsException(Exception):
+class DigitsException(Exception):
     def __init__(self, value):
         self.value = value
 
@@ -11,7 +11,7 @@ class RadixSystemDigitsException(Exception):
         return repr(self.value)
 
 
-class RadixSystemDigits(object):
+class Digits(object):
     def get_congruent_element(self, v, rs):
         """
         Computes the congruent element for a given point v
@@ -33,12 +33,12 @@ class RadixSystemDigits(object):
         if self.digits is not None:
             return self.digits
         else:
-            raise RadixSystemDigitsException("You must implement the getDigitSet method for a digit generator.")
+            raise DigitsException("You must implement the getDigitSet method for a digit generator.")
 
 
-class RadixSystemSymmetricDigits(RadixSystemDigits):
+class SymmetricDigits(Digits):
     def __init__(self, j=1):
-        super(RadixSystemDigits, self).__init__()
+        super(Digits, self).__init__()
         self.j = j
 
     def get_digit_set(self, rs):
@@ -46,29 +46,29 @@ class RadixSystemSymmetricDigits(RadixSystemDigits):
                 range(rs.abs_determinant)]
 
 
-class RadixSystemCanonicalDigits(RadixSystemDigits):
+class CanonicalDigits(Digits):
     def __init__(self, j=1):
-        super(RadixSystemDigits, self).__init__()
+        super(Digits, self).__init__()
         self.j = j
 
     def get_digit_set(self, rs):
         return [[a if b == self.j - 1 else 0 for b in range(rs.dimension)] for a in range(rs.abs_determinant)]
 
 
-class RadixSystemShiftedCanonicalDigits(RadixSystemDigits):
+class ShiftedCanonicalDigits(Digits):
     def __init__(self, shift, j=1):
-        super(RadixSystemDigits, self).__init__()
+        super(Digits, self).__init__()
         self.j = j
         self.shift = shift
 
     def get_digit_set(self, rs):
         if self.shift > rs.abs_determinant - 1 or self.shift < 0:
-            raise RadixSystemDigitsException("You can't shift bigger than the abs of the determinant - 1!")
+            raise DigitsException("You can't shift bigger than the abs of the determinant - 1!")
         return [[a - self.shift if b == self.j - 1 else 0 for b in range(rs.dimension)] for a in
                 range(rs.abs_determinant)]
 
 
-class RadixSystemAdjointDigits(RadixSystemDigits):
+class AdjointDigits(Digits):
     def get_digit_set(self, rs):
         # first generating a complete residue system to cr_set
         insm_u = rs.smith_u.inverse()
@@ -112,9 +112,9 @@ class RadixSystemAdjointDigits(RadixSystemDigits):
         return v1
 
 
-class RadixSystemDenseDigits(RadixSystemAdjointDigits):
+class DenseDigits(AdjointDigits):
     def get_digit_set(self, rs):
-        bset = super(RadixSystemDenseDigits, self).get_digit_set(rs)
+        bset = super(DenseDigits, self).get_digit_set(rs)
         tempset = []
 
         operator_matrix = rs.operator.operator

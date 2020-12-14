@@ -1,7 +1,7 @@
 from sage.all import *
 
 
-class RadixSystemOperatorException(Exception):
+class OperatorException(Exception):
     def __init__(self, value):
         self.value = value
 
@@ -9,11 +9,11 @@ class RadixSystemOperatorException(Exception):
         return repr(self.value)
 
 
-class RadixSystemCantCreateOperator(Exception):
+class CantCreateOperator(Exception):
     pass
 
 
-class RadixSystemOperator(object):
+class Operator(object):
     def __init__(self, norm_type=None):
         self.norm_type = norm_type
 
@@ -28,7 +28,7 @@ class RadixSystemOperator(object):
             self.norm_type = "jacobi"
             self.construct_operator_norm(rs)
         else:
-            raise RadixSystemCantCreateOperator("Can't use the passed norm! " + str(self.norm_type))
+            raise CantCreateOperator("Can't use the passed norm! " + str(self.norm_type))
 
     def norm(self, v):
         if self.norm_type == "jacobi":
@@ -38,7 +38,7 @@ class RadixSystemOperator(object):
         elif self.norm_type is not None:
             return v.norm(self.norm_type)
         else:
-            raise RadixSystemOperatorException("Operator not generated!")
+            raise OperatorException("Operator not generated!")
 
     def construct_operator_norm(self, rs):
         jacobi, self.operator = rs.inverse_base.change_ring(QQbar).jordan_form(transformation=True)
@@ -65,12 +65,12 @@ class RadixSystemOperator(object):
             i = i + 1
 
 
-class RadixSystemAlwaysExceptionOperator(RadixSystemOperator):
+class AlwaysExceptionOperator(Operator):
     def init_operator(self, rs):
         pass
 
     def norm(self, v):
-        raise RadixSystemOperatorException("RadixSystemAlwaysExceptionOperator used!")
+        raise OperatorException("RadixSystemAlwaysExceptionOperator used!")
 
 
 def custom_optimizing(m, func, iterate_num=100):
@@ -110,7 +110,7 @@ def custom_optimizing(m, func, iterate_num=100):
     return s
 
 
-class RadixSystemFrobeniusOperator(RadixSystemOperator):
+class FrobeniusOperator(Operator):
     def __init__(self, j=1):
         super().__init__()
         self.j = j
@@ -118,9 +118,9 @@ class RadixSystemFrobeniusOperator(RadixSystemOperator):
 
     def init_operator(self, rs):
         if rs.dimension == 1:
-            raise RadixSystemCantCreateOperator("Can't use Frobenius based operator in 1 dimension!")
+            raise CantCreateOperator("Can't use Frobenius based operator in 1 dimension!")
 
         self.oper_s = custom_optimizing(rs.base, lambda new_m: new_m.norm('frob') ^ 2)
 
         if (self.oper_s * rs.base * self.oper_s.inverse()).norm('frob') >= 1:
-            raise RadixSystemCantCreateOperator("Frobenius based operator creation failed!")
+            raise CantCreateOperator("Frobenius based operator creation failed!")

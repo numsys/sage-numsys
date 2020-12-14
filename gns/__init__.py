@@ -1,32 +1,31 @@
-from .RadixSystem import *
-from .RadixSystemDigits import *
-from .RadixSystemOperator import *
-from .RadixSystemDrawer import *
+from .SemiRadixSystem import *
+from .Digits import *
+from .Operator import *
+from .Drawer import *
 
 __all__ = [
-    'RadixSystem',
-    'RadixSystemException',
-    'RadixSystemFullResidueSystemException',
-    'RadixSystemExpansivityException',
-    'RadixSystemUnitConditionException',
-    'RadixSystemRegularityException',
-    'RadixSystemOptimizationFailed',
-    'RadixSystemSmartDecideTimeout',
-    'RadixSystemAlwaysExceptionOperator',
+    'SemiRadixSystem',
+    'FullResidueSystemException',
+    'ExpansivityException',
+    'UnitConditionException',
+    'RegularityException',
+    'OptimizationFailed',
+    'SmartDecideTimeout',
+    'AlwaysExceptionOperator',
 
     'phi_optimize_target_function',
-    'RadixSystemDigits',
-    'RadixSystemSymmetricDigits',
-    'RadixSystemCanonicalDigits',
-    'RadixSystemShiftedCanonicalDigits',
-    'RadixSystemAdjointDigits',
-    'RadixSystemDenseDigits',
+    'Digits',
+    'SymmetricDigits',
+    'CanonicalDigits',
+    'ShiftedCanonicalDigits',
+    'AdjointDigits',
+    'DenseDigits',
 
-    'RadixSystemOperatorException',
-    'RadixSystemCantCreateOperator',
-    'RadixSystemOperator',
-    'RadixSystemAlwaysExceptionOperator',
-    'RadixSystemFrobeniusOperator',
+    'OperatorException',
+    'CantCreateOperator',
+    'Operator',
+    'AlwaysExceptionOperator',
+    'FrobeniusOperator',
 
-    'RadixSystemDrawer'
+    'Drawer'
 ]
