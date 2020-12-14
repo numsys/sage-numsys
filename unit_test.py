@@ -205,7 +205,7 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': True,
             },
             {
-                'active': False,
+                'active': True,
                 'name': 'M_A(1,1) simultaneous rs',
                 'm': Matrix(ZZ, [[1, -1, 0, 0], [1, 1, 0, 0], [0, 0, 2, -1], [0, 0, 1, 2]]),
                 'digits': DenseDigits(),
@@ -225,7 +225,7 @@ class RadixSystemTest(unittest.TestCase):
                     ],
             },
             {
-                'active': False,
+                'active': True,
                 'name': 'M_B(-1,1) simultaneous rs',
                 'm': Matrix(ZZ, [[-1, -1, 0, 0], [1, -1, 0, 0], [0, 0, -1, -2], [0, 0, 2, -1]]),
                 'digits': DenseDigits(),
