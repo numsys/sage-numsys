@@ -18,9 +18,9 @@ class CantCreateOperator(Exception):
 class Operator(object):
     def __init__(self, norm_type=None):
         self.norm_type = norm_type
+        self.initialized = False
 
     def init_operator(self, rs):
-
         dense_inverse_m = to_dense(rs.get_base())
         if (self.norm_type == Infinity or self.norm_type is None) and dense_inverse_m.norm(Infinity) < 1:
             self.norm_type = Infinity
@@ -33,6 +33,10 @@ class Operator(object):
             self.construct_operator_norm(rs)
         else:
             raise CantCreateOperator("Can't use the passed norm! " + str(self.norm_type))
+        self.initialized = True
+
+    def is_initialized(self):
+        return self.initialized
 
     def norm(self, v):
         if self.norm_type == "jacobi":

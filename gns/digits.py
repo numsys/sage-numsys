@@ -125,7 +125,7 @@ class DenseDigits(AdjointDigits):
         bset = super(DenseDigits, self).get_digit_set(rs)
         tempset = []
 
-        operator_matrix = rs.operator.operator
+        operator_matrix = rs.get_operator().operator
         while tempset != bset:
             tempset = bset
             bset = []

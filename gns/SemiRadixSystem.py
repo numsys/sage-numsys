@@ -223,8 +223,6 @@ class SemiRadixSystem(object):
             b = {tuple([s if i == j else 0 for j in range(self.get_dimension())]) for i in range(self.get_dimension())
                  for s in [-1, 1]}
             for p in b.union(e):
-                #                print(self.getOrbitFrom(p))
-                #                print(self.getOrbitFrom(p)[-1])
                 if self.get_orbit_from(p)[-1] != [0] * self.get_dimension():
                     return False
             return True
@@ -495,6 +493,6 @@ class SemiRadixSystem(object):
         return self.dimension
 
     def get_operator(self):
-        if not hasattr(self, 'operator'):
+        if not self.operator.is_initialized():
             self.operator.init_operator(self)
         return self.operator
