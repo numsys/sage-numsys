@@ -109,6 +109,42 @@ class RadixSystemTest(unittest.TestCase):
                     }
             },
             {
+                'm': Matrix(ZZ, [[0, 2], [1, 0]]),
+                'digits': CanonicalDigits(),
+                'isGNS': False,
+                'phiTests':
+                    [
+                        {'from': [-1, -1], 'to': [-1, -1]},
+                        {'from': [-1, 0], 'to': [0, -1]},
+                    ],
+                'orbitTests':
+                    [
+                        {'from': [-1, 0], 'to': [[-1, 0], [0, -1], [-1, 0]]}
+                    ],
+            },
+            {
+                'm': Matrix(ZZ, [[-3, 1], [1, -2]]),
+                'digits': CanonicalDigits(),
+                'isGNS': True,
+                'assertVariable':
+                    {
+                        'digits': [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]
+                    }
+            },
+            {
+                'm': Matrix(ZZ, [[20, 463], [1, 21]]),
+                'digits': CanonicalDigits(),
+                'isGNS': False,
+                'phiTests':
+                    [
+                        {'from': [-1, 0], 'to': [21, -1]},
+                    ],
+                'orbitTests':
+                    [
+                        {'from': [-1, 0], 'to': [[-1, 0], [21, -1], [-1, 0]]}
+                    ],
+            },
+            {
                 'm': Matrix(ZZ, [[3]]),
                 'digits': Digits([[-2], [0], [2]]),
                 'phiTests':
