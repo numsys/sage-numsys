@@ -121,6 +121,10 @@ class RadixSystemTest(unittest.TestCase):
                     [
                         {'from': [-1, 0], 'to': [[-1, 0], [0, -1], [-1, 0]]}
                     ],
+                'assertVariable':
+                   {
+                        'digits': [[0, 0], [1, 0]]
+                   }
             },
             {
                 'm': Matrix(ZZ, [[-3, 1], [1, -2]]),
