@@ -238,9 +238,9 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'name' : 'M_B(-2,-1)',
-                'm': Matrix(ZZ, [[-2, 1, 0, 0], [-1, -1, 0, 0], [0, 0, -2, -2], [0, 0, 0, -2]]),
+                'm': Matrix(ZZ, [[-2, 1, 0, 0], [-1, -1, 0, 0], [0, 0, -2, 0], [0, 0, 0, -2]]),
                 'digits': Digits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [0, 1, 0, 1],
-                                  [-2, 1, -2, 1], [1, -2, 1, -2], [-3, -1, -3, -1], [-2, 0, 0, -2],
+                                  [-2, 1, -2, 1], [1, -2, 1, -2], [-3, -1, -3, -1], [-2, 0, -2, 0],
                                   [-1, -1, -1, -1], [-2, -1, -2, -1], [-1, -2, -1, -2], [-3, -3, -3, -3]]),
                 'isGNS': True,
             },
@@ -344,10 +344,16 @@ class RadixSystemTest(unittest.TestCase):
                 self.assertEqual(subject['numsys'].compute_cover_box(), subject['coverBox'])
 
             if 'assertVariable' in subject:
+                if self.debug:
+                    print('Assert variable test')
+
                 for assertation in subject['assertVariable']:
                     self.assertEqual(getattr(subject['numsys'], assertation), subject['assertVariable'][assertation])
 
-            if 'isGNS' == subject:
+            if 'isGNS' in subject:
+                if self.debug:
+                    print('Decision test')
+
                 self.assertEqual(subject['numsys'].is_gns(), subject['isGNS'])
 
     def test_simple_optimization(self):
