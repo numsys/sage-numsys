@@ -180,7 +180,7 @@ class RadixSystemTest(unittest.TestCase):
                     ],
             },
             {
-                'active': False,
+                'active': True,
                 'name': 'Adjoint digits test',
                 'm': Matrix(ZZ, [[2, -1], [1, 2]]),
                 'digits': AdjointDigits(),
@@ -191,7 +191,7 @@ class RadixSystemTest(unittest.TestCase):
                     },
             },
             {
-                'active': False,
+                'active': True,
                 'm': Matrix(ZZ, [[3, -1], [1, 3]]),
                 'digits': AdjointDigits(),
                 'isGNS': True,
@@ -252,7 +252,7 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': True,
             },
             {
-                'active': False,
+                'active': True,
                 'name': 'M_A(1,1) simultaneous rs',
                 'm': Matrix(ZZ, [[1, -1, 0, 0], [1, 1, 0, 0], [0, 0, 2, -1], [0, 0, 1, 2]]),
                 'digits': DenseDigits(),
@@ -272,7 +272,7 @@ class RadixSystemTest(unittest.TestCase):
                     ],
             },
             {
-                'active': False,
+                'active': True,
                 'name': 'M_B(-1,1) simultaneous rs',
                 'm': Matrix(ZZ, [[-1, -1, 0, 0], [1, -1, 0, 0], [0, 0, -1, -2], [0, 0, 2, -1]]),
                 'digits': DenseDigits(),
