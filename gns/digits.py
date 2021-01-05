@@ -26,7 +26,7 @@ class Digits(object):
                 s = s + smith_u[i, j] * v[j]
             res = res * smith_diagonal[i] + (s % smith_diagonal[i])
             i = i - 1
-        return rs.get_digit_hash()[res]
+        return copy(rs.get_digit_hash()[res])
 
     def __init__(self, digits=None):
         self.digits = digits

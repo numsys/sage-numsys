@@ -26,16 +26,17 @@ class Drawer:
         rgbcolor - the color, default is black
         flag - if it is 1 then the set of points of fractions are computed, if it is -1 then the opposite set, default is -1
         """
-        k = [[0, 0]]
+        fraction_points = [[0, 0]]
         for i in range(1, iter_num):
-            old_k = k[:]
-            for d in rs.digits:
+            old_k = fraction_points[:]
+            for d in rs.get_digits():
                 for k in old_k:
-                    new_point = (rs.inverse_base ^ i * vector(d) + vector(k)).list()
-                    if new_point not in k:
-                        k.append(new_point)
-        k = [(flag * vector(k)).list() for k in k]
-        return points(k, rgbcolor=rgbcolor)
+                    new_point = ((rs.get_inverse_base() ** i) * vector(d) + vector(k)).list()
+                    if new_point not in fraction_points:
+                        fraction_points.append(new_point)
+
+        fraction_points = [(flag * vector(p)).list() for p in fraction_points]
+        return points(fraction_points, rgbcolor=rgbcolor)
 
     def get_cover_box_plot(self, rs):
         cover = rs.get_cover_box()
