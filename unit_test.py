@@ -136,6 +136,7 @@ class RadixSystemTest(unittest.TestCase):
                     }
             },
             {
+                'active': False,
                 'm': Matrix(ZZ, [[20, 463], [1, 21]]),
                 'digits': CanonicalDigits(),
                 'isGNS': False,
