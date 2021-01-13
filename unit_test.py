@@ -121,6 +121,10 @@ class RadixSystemTest(unittest.TestCase):
                     [
                         {'from': [-1, 0], 'to': [[-1, 0], [0, -1], [-1, 0]]}
                     ],
+                'assertVariable':
+                    {
+                        'digits': [[0, 0], [1, 0]]
+                    }
             },
             {
                 'm': Matrix(ZZ, [[-3, 1], [1, -2]]),
@@ -132,6 +136,7 @@ class RadixSystemTest(unittest.TestCase):
                     }
             },
             {
+                'active': False,
                 'm': Matrix(ZZ, [[20, 463], [1, 21]]),
                 'digits': CanonicalDigits(),
                 'isGNS': False,
@@ -176,6 +181,7 @@ class RadixSystemTest(unittest.TestCase):
                     ],
             },
             {
+                'active': True,
                 'name': 'Adjoint digits test',
                 'm': Matrix(ZZ, [[2, -1], [1, 2]]),
                 'digits': AdjointDigits(),
@@ -186,6 +192,7 @@ class RadixSystemTest(unittest.TestCase):
                     },
             },
             {
+                'active': True,
                 'm': Matrix(ZZ, [[3, -1], [1, 3]]),
                 'digits': AdjointDigits(),
                 'isGNS': True,
@@ -197,9 +204,21 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[2, -1, 0, 0], [1, 2, 0, 0], [0, 0, 3, -1], [0, 0, 1, 3]]),
-                'digits': [[x[0], x[1], x[0], x[1]] for x in [Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
-                           for d2 in [[0, 0], [1, 0], [-1, -1], [0, -1], [1, -1], [1, 2], [-1, 1], [0, 1], [1, 1], [-1, 0]]
-                           for d1 in [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]]],
+                'digits':   [
+                                [x[0], x[1], x[0], x[1]]
+                                for x in
+                                    [
+                                        Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
+                                        for d2 in [
+                                            [0, 0], [1, 0], [-1, -1], [0, -1],
+                                            [1, -1], [1, 2],[-1, 1], [0, 1],
+                                            [1, 1], [-1, 0]
+                                        ]
+                                        for d1 in [
+                                            [0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]
+                                        ]
+                                    ]
+                            ],
                 'isGNS': False,
             },
             {
@@ -208,15 +227,25 @@ class RadixSystemTest(unittest.TestCase):
                     SemiRadixSystem([[3, -1], [1, 3]], AdjointDigits())
                 ]),
                 'assertVariable':
-                {
-                    'digits': [[x[0], x[1], x[0], x[1]] for x in [Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
-                           for d2 in [[0, 0], [1, 0], [-1, -1], [0, -1], [1, -1], [1, 2], [-1, 1], [0, 1], [1, 1], [-1, 0]]
-                           for d1 in [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]]],
-                },
+                    {
+                        'digits': [
+                                    [x[0], x[1], x[0], x[1]]
+                                    for x in
+                                    [
+                                        Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
+                                        for d2 in [
+                                            [0, 0], [1, 0], [-1, -1], [0, -1],
+                                            [1, -1], [1, 2], [-1, 1], [0, 1],
+                                            [1, 1], [-1, 0]
+                                        ]
+                                        for d1 in [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]
+                                    ]
+                                  ],
+                    },
                 'isGNS': False,
             },
             {
-                'name' : 'M_A(0,2) ns',
+                'name': 'M_A(0,2) ns',
                 'm': Matrix(ZZ, [[0, -2, 0, 0], [2, -2, 0, 0], [0, 0, 1, -2], [0, 0, 2, -1]]),
                 'digits': Digits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [1, 1, 1, 1],
                                   [-1, 0, -1, 0], [-2, 0, -2, 0], [-1, -1, -1, -1], [-2, -1, -2, -1],
@@ -233,10 +262,10 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': True,
             },
             {
-                'name' : 'M_B(-2,-1)',
-                'm': Matrix(ZZ, [[-2, 1, 0, 0], [-1, -1, 0, 0], [0, 0, -2, -2], [0, 0, 0, -2]]),
+                'name': 'M_B(-2,-1)',
+                'm': Matrix(ZZ, [[-2, 1, 0, 0], [-1, -1, 0, 0], [0, 0, -2, 0], [0, 0, 0, -2]]),
                 'digits': Digits([[0, 0, 0, 0], [1, 0, 1, 0], [0, 2, 0, 2], [0, 1, 0, 1],
-                                  [-2, 1, -2, 1], [1, -2, 1, -2], [-3, -1, -3, -1], [-2, 0, 0, -2],
+                                  [-2, 1, -2, 1], [1, -2, 1, -2], [-3, -1, -3, -1], [-2, 0, -2, 0],
                                   [-1, -1, -1, -1], [-2, -1, -2, -1], [-1, -2, -1, -2], [-3, -3, -3, -3]]),
                 'isGNS': True,
             },
@@ -287,6 +316,32 @@ class RadixSystemTest(unittest.TestCase):
                         {'from': [0, -1, 0, 0],
                          'to': [[0, -1, 0, 0], [-1, -1, 0, 0], [1, 2, 0, 1], [0, -1, 0, 0]]}
                     ],
+            },
+            {
+                'active': False,
+                'name': '',
+                'm': Matrix(ZZ, [[1, 1, -1, 0], [-1, 0, 1, 1], [1, 0, -1, 1], [-1, 0, 0, 0]]),
+                'digits': DenseDigits(),
+                'operator': Operator('jacobi'),
+            },
+            {
+                'active': True,
+                'm': Matrix(ZZ, [[3]]),
+                'digits': Digits([[0], [7], [2]]),
+                'isGNS': False,
+            },
+            {
+                # 'active': False,
+                'm': Matrix(ZZ, [[0, 0, 0, -15], [1, 0, 0, -1], [0, 1, 0, -2], [0, 0, 1, -3]]),
+                'digits': SymmetricDigits(),
+                'isGNS': True,
+            },
+            {
+                # 'active': False,
+                'm': Matrix(ZZ, [[0, 0, 0, 0, 0, 17], [1, 0, 0, 0, 0, 2], [0, 1, 0, 0, 0, 2], [0, 0, 1, 0, 0, 1],
+                                 [0, 0, 0, 1, 0, 1], [0, 0, 0, 0, 1, 1]]),
+                'digits': SymmetricDigits(),
+                'isGNS': True,
             }
         ]
         for it, subject in enumerate(subjects):
@@ -295,7 +350,7 @@ class RadixSystemTest(unittest.TestCase):
 
             if self.debug:
                 print('---------------------')
-                print('Testing case ('+str(it)+')')
+                print('Testing case (' + str(it) + ')')
                 if 'name' in subject:
                     print(subject['name'])
                 if 'm' in subject:
@@ -315,7 +370,8 @@ class RadixSystemTest(unittest.TestCase):
                 print('Testing phi from digits')
 
             for d in subject['numsys'].get_digits():
-                self.assertEqual(subject['numsys'].phi_function(d), [0 for x in range(subject['numsys'].get_dimension())])
+                self.assertEqual(subject['numsys'].phi_function(d),
+                                 [0 for x in range(subject['numsys'].get_dimension())])
 
             # operator test....
 
@@ -340,10 +396,16 @@ class RadixSystemTest(unittest.TestCase):
                 self.assertEqual(subject['numsys'].compute_cover_box(), subject['coverBox'])
 
             if 'assertVariable' in subject:
+                if self.debug:
+                    print('Assert variable test')
+
                 for assertation in subject['assertVariable']:
                     self.assertEqual(getattr(subject['numsys'], assertation), subject['assertVariable'][assertation])
 
-            if 'isGNS' == subject:
+            if 'isGNS' in subject:
+                if self.debug:
+                    print('Decision test')
+
                 self.assertEqual(subject['numsys'].is_gns(), subject['isGNS'])
 
     def test_simple_optimization(self):
@@ -360,7 +422,8 @@ class RadixSystemTest(unittest.TestCase):
         optimized_vol, optimized_volume_t = rs.optimize(return_transformation_also=True, timeout=30)
 
         optimized_phi, optimized_volt_t = rs.optimize(
-            target_function=lambda act_val, transformation_matrix: phi_optimize_target_function(act_val, transformation_matrix,
+            target_function=lambda act_val, transformation_matrix: phi_optimize_target_function(act_val,
+                                                                                                transformation_matrix,
                                                                                                 optimized_volume_t.inverse()),
             return_transformation_also=True, debug=False, timeout=None)
 
@@ -386,5 +449,3 @@ class RadixSystemTest(unittest.TestCase):
 
 unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
     unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))
-
-
