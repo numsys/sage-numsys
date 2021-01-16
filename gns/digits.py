@@ -98,7 +98,7 @@ class AdjointDigits(Digits):
             if i == [0] * rs.dimension:
                 bs.append(i)
             else:
-                bs.append([x / rs.determinant for x in rs.get_base() * vector(self.get_congruent_element(i,rs))])
+                bs.append(self.get_congruent_element(i,rs))
         return bs
     def get_congruent_element(self, v, rs):
         """
@@ -117,8 +117,7 @@ class AdjointDigits(Digits):
                 s = (s + rs.adjoint_m[i, j] * v[j])
             s = get_symmetric_modulo(s, rs.determinant)
             v1.append(s)
-        return v1
-
+        return list(rs.get_base() * vector(v1)/rs.determinant)
 
 class DenseDigits(AdjointDigits):
     def get_digit_set(self, rs):
