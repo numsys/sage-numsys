@@ -181,7 +181,6 @@ class RadixSystemTest(unittest.TestCase):
                     ],
             },
             {
-                'active': True,
                 'name': 'Adjoint digits test',
                 'm': Matrix(ZZ, [[2, -1], [1, 2]]),
                 'digits': AdjointDigits(),
@@ -192,7 +191,6 @@ class RadixSystemTest(unittest.TestCase):
                     },
             },
             {
-                'active': True,
                 'm': Matrix(ZZ, [[3, -1], [1, 3]]),
                 'digits': AdjointDigits(),
                 'isGNS': True,
@@ -270,74 +268,22 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': True,
             },
             {
-                'active': True,
-                'name': 'M_A(1,1) simultaneous rs',
-                'm': Matrix(ZZ, [[1, -1, 0, 0], [1, 1, 0, 0], [0, 0, 2, -1], [0, 0, 1, 2]]),
-                'digits': DenseDigits(),
-                'operator': Operator('jacobi'),
-                'assertVariable':
-                    {
-                        'digits': [[0, 0, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 1, 1],
-                                   [-1, 0, -1, 0], [0, -1, 0, -1], [-1, -1, -1, -1], [-1, 1, -1, 1], [1, -1, 1, -1],
-                                   [-1, 2, -1, 2]],
-                    },
-                'phiTests':
-                    [
-                        {'from': [-1, -1, 0, 1], 'to': [-1, -1, 0, 1]},
-                        {'from': [-1, 1, -1, 0], 'to': [-1, 1, -1, 0]},
-                        {'from': [1, 1, 0, 1], 'to': [1, 1, 0, 1]},
-                        {'from': [1, -1, 1, 0], 'to': [1, -1, 1, 0]},
-                    ],
-            },
-            {
-                'active': True,
-                'name': 'M_B(-1,1) simultaneous rs',
-                'm': Matrix(ZZ, [[-1, -1, 0, 0], [1, -1, 0, 0], [0, 0, -1, -2], [0, 0, 2, -1]]),
-                'digits': DenseDigits(),
-                'operator': Operator('jacobi'),
-                'assertVariable':
-                    {
-                        'digits': [[0, 0, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 1, 1],
-                                   [-1, 0, -1, 0], [0, -1, 0, -1], [-1, -1, -1, -1], [-1, 1, -1, 1], [1, -1, 1, -1],
-                                   [-2, -1, -2, 1]],
-                    },
-                'phiTests':
-                    [
-                        {'from': [-1, -1, 0, -1], 'to': [-1, 1, -1, 0]},
-                        {'from': [-1, 1, -1, 0], 'to': [-1, 1, 0, 1]},
-                        {'from': [1, 1, 0, 1], 'to': [1, -1, 1, 0]},
-                        {'from': [1, -1, 1, 0], 'to': [-1, -1, 0, -1]},
-                    ],
-                'orbitTests':
-                    [
-                        {'from': [0, 1, 0, 0],
-                         'to': [[0, 1, 0, 0], [0, -2, 0, 1], [-2, 1, -1, 0], [1, 0, 0, 0], [-1, -2, 0, 1],
-                                [-1, -2, 0, 1], [0, 1, 0, 0]]},
-                        {'from': [0, -1, 0, 0],
-                         'to': [[0, -1, 0, 0], [-1, -1, 0, 0], [1, 2, 0, 1], [0, -1, 0, 0]]}
-                    ],
-            },
-            {
-                'active': False,
                 'name': '',
                 'm': Matrix(ZZ, [[1, 1, -1, 0], [-1, 0, 1, 1], [1, 0, -1, 1], [-1, 0, 0, 0]]),
                 'digits': DenseDigits(),
                 'operator': Operator('jacobi'),
             },
             {
-                'active': True,
                 'm': Matrix(ZZ, [[3]]),
                 'digits': Digits([[0], [7], [2]]),
                 'isGNS': False,
             },
             {
-                # 'active': False,
                 'm': Matrix(ZZ, [[0, 0, 0, -15], [1, 0, 0, -1], [0, 1, 0, -2], [0, 0, 1, -3]]),
                 'digits': SymmetricDigits(),
                 'isGNS': True,
             },
             {
-                # 'active': False,
                 'm': Matrix(ZZ, [[0, 0, 0, 0, 0, 17], [1, 0, 0, 0, 0, 2], [0, 1, 0, 0, 0, 2], [0, 0, 1, 0, 0, 1],
                                  [0, 0, 0, 1, 0, 1], [0, 0, 0, 0, 1, 1]]),
                 'digits': SymmetricDigits(),
@@ -345,68 +291,125 @@ class RadixSystemTest(unittest.TestCase):
             }
         ]
         for it, subject in enumerate(subjects):
-            if 'active' in subject and subject['active'] == False:
-                continue
+            self.run_subject_complex_test(subject, it)
 
+    def test_simultaneous_m_a_1_1(self):
+        self.run_subject_complex_test({
+            'active': True,
+            'name': 'M_A(1,1) simultaneous rs',
+            'm': Matrix(ZZ, [[1, -1, 0, 0], [1, 1, 0, 0], [0, 0, 2, -1], [0, 0, 1, 2]]),
+            'digits': DenseDigits(),
+            'operator': Operator('jacobi'),
+            'assertVariable':
+                {
+                    'digits': [[0, 0, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 1, 1],
+                               [-1, 0, -1, 0], [0, -1, 0, -1], [-1, -1, -1, -1], [-1, 1, -1, 1], [1, -1, 1, -1],
+                               [-1, 2, -1, 2]],
+                },
+            'phiTests':
+                [
+                    {'from': [-1, -1, 0, 1], 'to': [-1, -1, 0, 1]},
+                    {'from': [-1, 1, -1, 0], 'to': [-1, 1, -1, 0]},
+                    {'from': [1, 1, 0, 1], 'to': [1, 1, 0, 1]},
+                    {'from': [1, -1, 1, 0], 'to': [1, -1, 1, 0]},
+                ],
+        })
+    def test_simultaneous_m_b_m1_1(self):
+        self.run_subject_complex_test({
+            'active': True,
+            'name': 'M_B(-1,1) simultaneous rs',
+            'm': Matrix(ZZ, [[-1, -1, 0, 0], [1, -1, 0, 0], [0, 0, -1, -2], [0, 0, 2, -1]]),
+            'digits': DenseDigits(),
+            'operator': Operator('jacobi'),
+            'assertVariable':
+                {
+                    'digits': [[0, 0, 0, 0], [1, 0, 1, 0], [0, 1, 0, 1], [1, 1, 1, 1],
+                               [-1, 0, -1, 0], [0, -1, 0, -1], [-1, -1, -1, -1], [-1, 1, -1, 1], [1, -1, 1, -1],
+                               [-2, -1, -2, 1]],
+                },
+            'phiTests':
+                [
+                    {'from': [-1, -1, 0, -1], 'to': [-1, 1, -1, 0]},
+                    {'from': [-1, 1, -1, 0], 'to': [-1, 1, 0, 1]},
+                    {'from': [1, 1, 0, 1], 'to': [1, -1, 1, 0]},
+                    {'from': [1, -1, 1, 0], 'to': [-1, -1, 0, -1]},
+                ],
+            'orbitTests':
+                [
+                    {'from': [0, 1, 0, 0],
+                     'to': [[0, 1, 0, 0], [0, -2, 0, 1], [-2, 1, -1, 0], [1, 0, 0, 0], [-1, -2, 0, 1],
+                            [-1, -2, 0, 1], [0, 1, 0, 0]]},
+                    {'from': [0, -1, 0, 0],
+                     'to': [[0, -1, 0, 0], [-1, -1, 0, 0], [1, 2, 0, 1], [0, -1, 0, 0]]}
+                ],
+        })
+
+
+    def run_subject_complex_test(self, subject, test_count = None):
+        if 'active' in subject and subject['active'] == False:
+            return
+
+        if self.debug:
+            print('---------------------')
+            print('Testing case (' + str(test_count) + ')')
+            if 'name' in subject:
+                print(subject['name'])
+            if 'm' in subject:
+                print(subject['m'])
+            # print(subject['digits'].digits)
+
+        if 'numsys' not in subject:
+            if 'operator' in subject:
+                subject['numsys'] = SemiRadixSystem(subject['m'], subject['digits'], operator=subject['operator'])
+            else:
+                subject['numsys'] = SemiRadixSystem(subject['m'], subject['digits'],
+                                                    operator=AlwaysExceptionOperator())
+
+        if self.debug:
+            print('digits:')
+            print(subject['numsys'].get_digits())
+            print('Testing phi from digits')
+
+        if 'assertVariable' in subject:
             if self.debug:
-                print('---------------------')
-                print('Testing case (' + str(it) + ')')
-                if 'name' in subject:
-                    print(subject['name'])
-                if 'm' in subject:
-                    print(subject['m'])
-                # print(subject['digits'].digits)
+                print('Assert variable test')
 
-            if 'numsys' not in subject:
-                if 'operator' in subject:
-                    subject['numsys'] = SemiRadixSystem(subject['m'], subject['digits'], operator=subject['operator'])
-                else:
-                    subject['numsys'] = SemiRadixSystem(subject['m'], subject['digits'],
-                                                        operator=AlwaysExceptionOperator())
+            for assertation in subject['assertVariable']:
+                print('Testing variable',assertation)
+                self.assertEqual(getattr(subject['numsys'], assertation), subject['assertVariable'][assertation])
 
+
+        for d in subject['numsys'].get_digits():
+            self.assertEqual(subject['numsys'].phi_function(d),
+                             [0 for x in range(subject['numsys'].get_dimension())])
+
+        # operator test....
+
+        if 'phiTests' in subject:
+            for test_case in subject['phiTests']:
+                if self.debug:
+                    print('Phi test from', test_case['from'])
+
+                self.assertEqual(subject['numsys'].phi_function(test_case['from']), test_case['to'])
+
+        if 'orbitTests' in subject:
+            for test_case in subject['orbitTests']:
+                if self.debug:
+                    print('Orbit test from', test_case['from'])
+
+                self.assertEqual(subject['numsys'].get_orbit_from(test_case['from']), test_case['to'])
+
+        if 'coverBox' in subject:
             if self.debug:
-                print('digits:')
-                print(subject['numsys'].get_digits())
-                print('Testing phi from digits')
+                print('Cover box test')
 
-            for d in subject['numsys'].get_digits():
-                self.assertEqual(subject['numsys'].phi_function(d),
-                                 [0 for x in range(subject['numsys'].get_dimension())])
+            self.assertEqual(subject['numsys'].compute_cover_box(), subject['coverBox'])
 
-            # operator test....
+        if 'isGNS' in subject:
+            if self.debug:
+                print('Decision test')
 
-            if 'phiTests' in subject:
-                for test_case in subject['phiTests']:
-                    if self.debug:
-                        print('Phi test from', test_case['from'])
-
-                    self.assertEqual(subject['numsys'].phi_function(test_case['from']), test_case['to'])
-
-            if 'orbitTests' in subject:
-                for test_case in subject['orbitTests']:
-                    if self.debug:
-                        print('Orbit test from', test_case['from'])
-
-                    self.assertEqual(subject['numsys'].get_orbit_from(test_case['from']), test_case['to'])
-
-            if 'coverBox' in subject:
-                if self.debug:
-                    print('Cover box test')
-
-                self.assertEqual(subject['numsys'].compute_cover_box(), subject['coverBox'])
-
-            if 'assertVariable' in subject:
-                if self.debug:
-                    print('Assert variable test')
-
-                for assertation in subject['assertVariable']:
-                    self.assertEqual(getattr(subject['numsys'], assertation), subject['assertVariable'][assertation])
-
-            if 'isGNS' in subject:
-                if self.debug:
-                    print('Decision test')
-
-                self.assertEqual(subject['numsys'].is_gns(), subject['isGNS'])
+            self.assertEqual(subject['numsys'].is_gns(), subject['isGNS'])
 
     def test_simple_optimization(self):
         rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
@@ -447,5 +450,6 @@ class RadixSystemTest(unittest.TestCase):
         self.assertTrue(rs.smart_decide())
 
 
-unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
-    unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))
+if __name__ == "__main__":
+    unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
+        unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))
