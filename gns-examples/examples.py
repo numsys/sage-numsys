@@ -2,7 +2,6 @@ from sage.all import *
 from pprint import pprint
 from gns import *
 
-
 print("==== Getting Started ====")
 rs = SemiRadixSystem([[0, -3], [1, 2]], [[0, 0], [1, 0], [2, 0]])
 print(rs.is_gns())
@@ -51,8 +50,8 @@ print(optimizePhiT)
 print("New base for phi optimized")
 print(optimizedPhi.get_base())
 
-
 import random
+
 optVolPoints = optimizedVol.get_points_in_box()
 for i in range(3):
     print("Get point from vol optimized:")
@@ -74,4 +73,3 @@ dr = Drawer()
 g = dr.get_phi_orbit_graph(rs)
 g.save("test.svg", figsize=16)
 # g.show()
-
