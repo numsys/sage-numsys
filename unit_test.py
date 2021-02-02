@@ -449,16 +449,6 @@ class RadixSystemTest(unittest.TestCase):
         rs = SemiRadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         self.assertTrue(rs.smart_decide())
 
-    def test_not_finite_expansion(self):
-        rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
-        self.assertFalse(rs.has_finite_expansion([6, 3]))
-
-    def test_finite_expansion(self):
-        m = Matrix(ZZ, [[2, -1], [1, 2]])
-        digits = Digits([[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]])
-        rs = SemiRadixSystem(m, digits)
-        self.assertTrue(rs.has_finite_expansion([-6, 3]))
-
 if __name__ == "__main__":
     unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
         unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))
