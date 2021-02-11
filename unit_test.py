@@ -449,7 +449,6 @@ class RadixSystemTest(unittest.TestCase):
         rs = SemiRadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         self.assertTrue(rs.smart_decide())
 
-
 if __name__ == "__main__":
     unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
         unittest.TestLoader().loadTestsFromTestCase(RadixSystemTest))
