@@ -314,7 +314,6 @@ class RadixSystemTest(unittest.TestCase):
                     {'from': [1, -1, 1, 0], 'to': [1, -1, 1, 0]},
                 ],
         })
-
     def test_simultaneous_m_b_m1_1(self):
         self.run_subject_complex_test({
             'active': True,
@@ -370,8 +369,6 @@ class RadixSystemTest(unittest.TestCase):
             print(subject['numsys'].get_digits())
             print('Testing phi from digits')
 
-        # TODO A)-t es B)-t ugy nezem, mintha valamilyen checker fuggvenyek lennenek az inputra... Szuksegesek?
-        # A)
         if 'assertVariable' in subject:
             if self.debug:
                 print('Assert variable test')
@@ -379,7 +376,8 @@ class RadixSystemTest(unittest.TestCase):
             for assertation in subject['assertVariable']:
                 print('Testing variable', assertation)
                 self.assertEqual(getattr(subject['numsys'], assertation), subject['assertVariable'][assertation])
-        # B)
+
+
         for d in subject['numsys'].get_digits():
             self.assertEqual(subject['numsys'].phi_function(d),
                              [0 for x in range(subject['numsys'].get_dimension())])
@@ -449,17 +447,6 @@ class RadixSystemTest(unittest.TestCase):
 
         rs = SemiRadixSystem([[0, 0, -2], [1, 0, -2], [0, 1, -2]], [[0, 0, 0], [1, 0, 0]])
         self.assertTrue(rs.smart_decide())
-
-    def test_not_finite_expansion(self):
-        rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
-        self.assertFalse(rs.has_finite_expansion([6, 3]))
-
-    def test_finite_expansion(self):
-        m = Matrix(ZZ, [[2, -1], [1, 2]])
-        digits = Digits([[0, 0], [1, 0], [0, 1], [0, -1], [-6, 5]])
-        rs = SemiRadixSystem(m, digits)
-        self.assertTrue(rs.has_finite_expansion([-6, 3]))
-
 
 if __name__ == "__main__":
     unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(

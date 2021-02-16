@@ -1,8 +1,7 @@
 from sage.all import *
-
-import collections
-
 from gns.SemiRadixSystem import SemiRadixSystem
+import collections
+import colorsys
 
 
 def update(d, u):
@@ -13,6 +12,13 @@ def update(d, u):
         else:
             d[k] = u[k]
     return d
+
+
+def get_hls_color(pair):
+    if pair[0] != 0 & pair[1] != 0:
+        return colorsys.rgb_to_hls(pair[0], pair[1], .1)
+    else:
+        return colorsys.rgb_to_hls(pair[0] + .1, pair[1] + .1, .1)
 
 
 class Drawer:
@@ -116,3 +122,14 @@ class Drawer:
         update(options, user_options if user_options is not None else {})
         gp = GraphPlot(g, options)
         return gp.plot()
+
+    def get_two_dimension_numbersystem_expansion_plot(self, ns, lower_bound, upper_bound):
+        import itertools
+
+        z_vectors = itertools.permutations(range(lower_bound, upper_bound), 2)
+        graphics = Graphics()
+
+        for z in z_vectors:
+            graphics += arrow(z, ns.phi_function(z), color=get_hls_color(z))
+
+        return graphics
