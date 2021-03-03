@@ -6,7 +6,6 @@ import unittest
 
 
 class PhiTestCase(unittest.TestCase):
-    # TODO Loggingot bevezetni (debug level) es ott kiirni a parametereket
 
     @parameterized.expand([
         ([-6, 5], [0, 0]),
@@ -67,7 +66,7 @@ class PhiTestCase(unittest.TestCase):
 
         self.assertEqual(numsys.phi_function(from_), expected)
 
-    def _test_phi_function_P6_canonical_digits_not_active(self):
+    def _test_phi_function_P6_canonical_digits(self):
         m = Matrix(ZZ, [[20, 463], [1, 21]])
         digits = CanonicalDigits()
         numsys = SemiRadixSystem(m, digits)

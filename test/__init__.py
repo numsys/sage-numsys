@@ -1,2 +1,2 @@
-from .RadixSystemTests import *
-from .ExceptionsTest import *
+from .test_radix_system import *
+from .test_exceptions import *
