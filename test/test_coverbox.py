@@ -1,4 +1,3 @@
-from parameterized import parameterized
 from sage.all import *
 from gns import *
 
