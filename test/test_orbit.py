@@ -68,7 +68,7 @@ class OrbitTestCase(unittest.TestCase):
         ([3], [[3], [1], [1]]),
         ([7], [[7], [3], [1], [1]]),
     ])
-    def est_orbit_O8(self, from_, expected):
+    def test_orbit_O8(self, from_, expected):
         m = Matrix(ZZ, [[3]])
         digits = Digits([[-2], [0], [2]])
         numsys = SemiRadixSystem(m, digits)
