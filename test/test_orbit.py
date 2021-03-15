@@ -86,6 +86,22 @@ class OrbitTestCase(unittest.TestCase):
                           [4, 0, 0, 0, 0], [0, 0, 0, 0, 0],
                           [0, 0, 0, 0, 0]])
 
+    @parameterized.expand([
+        ([0, 1, 0, 0], [[0, 1, 0, 0], [0, -2, 0, 1],
+                        [-2, 1, -1, 0], [1, 0, 0, 0],
+                        [-1, -2, 0, 1], [-1, -2, 0, 1], [0, 1, 0, 0]]),
+
+        ([0, -1, 0, 0], [[0, -1, 0, 0], [-1, -1, 0, 0],
+                         [1, 2, 0, 1], [0, -1, 0, 0]]),
+    ])
+    def test_orbit_M_B_minus_1_1_simultaneous_rs(self, from_, expected):
+        m = Matrix(ZZ, [[-1, -1, 0, 0], [1, -1, 0, 0], [0, 0, -1, -2], [0, 0, 2, -1]])
+        digits = DenseDigits()
+        operator_ = Operator('jacobi')
+        numsys = SemiRadixSystem(m, digits, operator_)
+
+        self.assertEqual(numsys.phi_function(from_), expected)
+
 
 if __name__ == '__main__':
     unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
