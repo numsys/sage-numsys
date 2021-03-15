@@ -4,3 +4,4 @@ from .test_orbit import *
 from .test_coverbox import *
 from .test_exceptions import *
 from .test_optimization import *
+from .test_smart_decide import *
