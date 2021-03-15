@@ -41,6 +41,13 @@ class CoverBoxTestCase(unittest.TestCase):
 
         self.assertEqual(numsys.compute_cover_box(), ([-1], [1]))
 
+    def test_cover_box_CB6_canonical_digits(self):
+        m = Matrix(ZZ, [[0, -2], [1, -2]])
+        digits = CanonicalDigits()
+        numsys = SemiRadixSystem(m, digits)
+
+        self.assertEqual(numsys.compute_cover_box(), ([-1, -1], [2, 1]))
+
 
 if __name__ == '__main__':
     unittest.TextTestRunner(sys.stderr, True, 1, False, False, None).run(
