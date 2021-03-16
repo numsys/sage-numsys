@@ -202,21 +202,21 @@ class RadixSystemTest(unittest.TestCase):
             },
             {
                 'm': Matrix(ZZ, [[2, -1, 0, 0], [1, 2, 0, 0], [0, 0, 3, -1], [0, 0, 1, 3]]),
-                'digits':   [
-                                [x[0], x[1], x[0], x[1]]
-                                for x in
-                                    [
-                                        Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
-                                        for d2 in [
-                                            [0, 0], [1, 0], [-1, -1], [0, -1],
-                                            [1, -1], [1, 2],[-1, 1], [0, 1],
-                                            [1, 1], [-1, 0]
-                                        ]
-                                        for d1 in [
-                                            [0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]
-                                        ]
-                                    ]
-                            ],
+                'digits': [
+                    [x[0], x[1], x[0], x[1]]
+                    for x in
+                    [
+                        Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
+                        for d2 in [
+                        [0, 0], [1, 0], [-1, -1], [0, -1],
+                        [1, -1], [1, 2], [-1, 1], [0, 1],
+                        [1, 1], [-1, 0]
+                    ]
+                        for d1 in [
+                        [0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]
+                    ]
+                    ]
+                ],
                 'isGNS': False,
             },
             {
@@ -227,18 +227,18 @@ class RadixSystemTest(unittest.TestCase):
                 'assertVariable':
                     {
                         'digits': [
-                                    [x[0], x[1], x[0], x[1]]
-                                    for x in
-                                    [
-                                        Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
-                                        for d2 in [
-                                            [0, 0], [1, 0], [-1, -1], [0, -1],
-                                            [1, -1], [1, 2], [-1, 1], [0, 1],
-                                            [1, 1], [-1, 0]
-                                        ]
-                                        for d1 in [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]
-                                    ]
-                                  ],
+                            [x[0], x[1], x[0], x[1]]
+                            for x in
+                            [
+                                Matrix(ZZ, [[2, -1], [1, 2]]) * vector(d2) + vector(d1)
+                                for d2 in [
+                                [0, 0], [1, 0], [-1, -1], [0, -1],
+                                [1, -1], [1, 2], [-1, 1], [0, 1],
+                                [1, 1], [-1, 0]
+                            ]
+                                for d1 in [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]
+                            ]
+                        ],
                     },
                 'isGNS': False,
             },
@@ -314,6 +314,7 @@ class RadixSystemTest(unittest.TestCase):
                     {'from': [1, -1, 1, 0], 'to': [1, -1, 1, 0]},
                 ],
         })
+
     def test_simultaneous_m_b_m1_1(self):
         self.run_subject_complex_test({
             'active': True,
@@ -344,8 +345,7 @@ class RadixSystemTest(unittest.TestCase):
                 ],
         })
 
-
-    def run_subject_complex_test(self, subject, test_count = None):
+    def run_subject_complex_test(self, subject, test_count=None):
         if 'active' in subject and subject['active'] == False:
             return
 
@@ -375,7 +375,7 @@ class RadixSystemTest(unittest.TestCase):
                 print('Assert variable test')
 
             for assertation in subject['assertVariable']:
-                print('Testing variable',assertation)
+                print('Testing variable', assertation)
                 self.assertEqual(getattr(subject['numsys'], assertation), subject['assertVariable'][assertation])
 
 
