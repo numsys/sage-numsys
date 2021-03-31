@@ -1,4 +1,3 @@
-from .ExceptionsTest import *
 from .test_phi_function import *
 from .test_gns import *
 from .test_orbit import *
