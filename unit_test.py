@@ -314,7 +314,6 @@ class RadixSystemTest(unittest.TestCase):
                     {'from': [1, -1, 1, 0], 'to': [1, -1, 1, 0]},
                 ],
         })
-
     def test_simultaneous_m_b_m1_1(self):
         self.run_subject_complex_test({
             'active': True,

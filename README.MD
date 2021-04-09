@@ -29,3 +29,12 @@ Check the path enviroment variable, if contains the folder where you added the l
 echo $PATH
 ```
 
+## Necessary packages for successfull test compilation
+
+### parameterized
+This package is used for parameterize unit test cases, allow to add multiple test data for a single test case.
+
+**Installation**: 
+```
+path/to/sage/python -m pip install parameterized
+```
