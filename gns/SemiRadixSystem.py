@@ -241,6 +241,14 @@ class SemiRadixSystem(object):
         return t.get_time() * (self.get_cover_box_volume() if volume is None else volume) / counter
 
     def smart_decide(self, optimal_runtime=60, debug=False):
+        if not self.check_expansivity():
+            return False
+        if not self.check_unit_condition():
+            return False
+        try:
+            self.check_crs_property_and_build_digits_hashes()
+        except:
+            return False
         actual_volume = self.get_cover_box_volume()
         if debug:
             print("Actual volume is ", actual_volume)

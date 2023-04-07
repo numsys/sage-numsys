@@ -58,7 +58,7 @@ class CanonicalDigits(Digits):
 
 
 class ShiftedCanonicalDigits(Digits):
-    def __init__(self, shift, j=1):
+    def __init__(self, j=1, shift=0):
         super(Digits, self).__init__()
         self.j = j
         self.shift = shift

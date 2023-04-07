@@ -1,12 +1,12 @@
 from sage.all import *
 from gns.SemiRadixSystem import SemiRadixSystem
-import collections
+from collections.abc import Mapping
 import colorsys
 
 
 def update(d, u):
     for k, v in u.items():
-        if isinstance(v, collections.Mapping):
+        if isinstance(v, Mapping):
             r = update(d.get(k, {}), v)
             d[k] = r
         else:
@@ -42,7 +42,7 @@ class Drawer:
                         fraction_points.append(new_point)
 
         fraction_points = [(flag * vector(p)).list() for p in fraction_points]
-        return points(fraction_points, rgbcolor=rgbcolor)
+        return points(fraction_points, rgbcolor=rgbcolor, size=2)
 
     def get_cover_box_plot(self, rs):
         cover = rs.get_cover_box()
