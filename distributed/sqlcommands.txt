@@ -1,0 +1,126 @@
+
+
+# Nemtommi
+
+SELECT rs.id,digits,generated_by,priority,p1.value as 'vol1',p2.value as 'vol2' ,pgns.value as 'isGNS'  FROM `radix_system` rs
+    LEFT JOIN digit_set AS ds ON rs.digit_set_id=ds.id
+    LEFT JOIN radix_system_property AS p1 ON rs.id=p1.radix_system_id AND p1.key='volume' 
+    LEFT JOIN similar_radix_system ON rs.id=similar_radix_system.radix_system_id_from 
+    LEFT JOIN radix_system_property AS p2 ON similar_radix_system.radix_system_id_to=p2.radix_system_id AND p2.key='volume'
+    LEFT JOIN radix_system_property AS pgns ON similar_radix_system.radix_system_id_to=pgns.radix_system_id AND pgns.key='gns'
+
+SELECT * FROM `radix_system_property` WHERE `key` LIKE 'progress%'
+
+
+# Nem optimalizált radix rendszerek
+
+SELECT * FROM `radix_system` rs 
+    LEFT JOIN radix_system_property rsp ON rs.id=rsp.radix_system_id AND `key`='optimized' 
+        WHERE rsp.id IS NULL
+
+
+UPDATE base b 
+    LEFT JOIN `radix_system` rs ON b.id = rs.base_id 
+    LEFT JOIN similar_radix_system srs ON rs.id=srs.radix_system_id_to 
+    LEFT JOIN radix_system rs2 ON rs2.id=srs.radix_system_id_from 
+    LEFT JOIN `base` b2 ON b2.id=rs2.base_id 
+        SET b.generated_by=b2.generated_by 
+            WHERE rs2.id IS NOT NULL AND b2.generated_by<>'' AND b.generated_by='' 
+
+
+
+SELECT 
+    rs.id, psig.value signature,
+    p0.value p0, p0l.value p0l, p0ol.value p0ol, p0sd.value p0sd,
+    p1.value p1, p1l.value p1l, p1ol.value p1ol, p1sd.value p1sd
+    FROM radix_system rs 
+        LEFT JOIN `radix_system_property` psig ON rs.id=psig.radix_system_id AND psig.`key`='signature'
+        LEFT JOIN `radix_system_property` p0 ON rs.id=p0.radix_system_id AND p0.`key`='period0'
+        LEFT JOIN `radix_system_property` p0l ON rs.id=p0l.radix_system_id AND p0l.`key`='period0Length'
+        LEFT JOIN `radix_system_property` p0ol ON rs.id=p0ol.radix_system_id AND p0ol.`key`='period0orbitLengths'
+        LEFT JOIN `radix_system_property` p0sd ON rs.id=p0sd.radix_system_id AND p0sd.`key`='period0sourceDistances'
+        LEFT JOIN `radix_system_property` p1 ON rs.id=p1.radix_system_id AND p1.`key`='period1'
+        LEFT JOIN `radix_system_property` p1l ON rs.id=p1l.radix_system_id AND p1l.`key`='period1Length'
+        LEFT JOIN `radix_system_property` p1ol ON rs.id=p1ol.radix_system_id AND p1ol.`key`='period1orbitLengths'
+        LEFT JOIN `radix_system_property` p1sd ON rs.id=p1sd.radix_system_id AND p1sd.`key`='period1sourceDistances'
+            WHERE p1.id IS NOT NULL
+            
+            
+            1229
+            673
+SELECT * FROM `radix_system_property` rsp 
+    LEFT JOIN radix_system_property rsp2 ON rsp.radix_system_id=rsp2.radix_system_id AND rsp2.key='volume'
+    LEFT JOIN radix_system_property rsp3 ON rsp.radix_system_id=rsp3.radix_system_id AND rsp3.key='gns'
+        WHERE rsp2.value >500 AND rsp3.value='0' AND rsp.`key`='signature' 
+            ORDER BY rsp2.value DESC
+        
+        
+SELECT rsp.value FROM `radix_system_property` rsp 
+    LEFT JOIN radix_system_property rsp2 ON rsp.radix_system_id=rsp2.radix_system_id AND rsp2.key='volume'
+    LEFT JOIN radix_system_property rsp3 ON rsp.radix_system_id=rsp3.radix_system_id AND rsp3.key='gns'
+        WHERE rsp2.value >500 AND rsp3.value='0' AND rsp.`key` LIKE 'period%sourceDistances' AND  rsp.`key` <>'period0sourceDistances'
+            ORDER BY rsp2.value DESC
+                
+            
+            
+DELETE FROM `radix_system_property` WHERE id IN (SELECT rsp.id FROM `radix_system_property` rsp
+    LEFT JOIN `radix_system_property` rsp2 ON rsp.radix_system_id = rsp2.radix_system_id AND rsp2.`key`='operatorTest'
+         WHERE rsp.`key`='block' AND rsp.`value`='waiting for operator test' AND rsp2.id IS NOT NULL)
+         
+         
+ SELECT * FROM `radix_system_property`        
+    WHERE `key`='block' AND `value`='waiting for operator test' AND radix_system_id IN 
+        (SELECT radix_system_id FROM`radix_system_property` WHERE `key`='operatorTest')
+        
+
+        
+        UPDATE `radix_system` SET `group`='garsia' WHERE digit_set_id IN (7,8,9,10,11,13,32,33,34)
+        
+SELECT * FROM `radix_system_property` WHERE `key`='block' AND `value`<>'operator fail'
+    
+SELECT `group`,count(*) FROM `radix_system` GROUP BY `group`
+
+SELECT `group`,count(*) FROM radix_system LEFT JOIN `radix_system_property` ON radix_system.id=radix_system_property.radix_system_id  WHERE `key`='block' AND `value`<>'operator fail' GROUP BY `group`
+    
+    
+SELECT `group`,count(*) FROM `radix_system` rs 
+    LEFT JOIN radix_system_property rsp ON rs.id=rsp.radix_system_id AND rsp.`key`='optimized' 
+    LEFT JOIN `radix_system_property` rsp2 ON rs.id=rsp2.radix_system_id  AND rsp2.`key`='block'
+        WHERE rsp.id IS NULL AND rsp2.id IS NULL
+            GROUP BY `group`
+
+
+SELECT * FROM `radix_system` rs
+    LEFT JOIN radix_system_property rsp1 ON rs.id=rsp1.radix_system_id AND rsp1.`key`='block'
+    LEFT JOIN radix_system_property rsp2 ON rs.id=rsp2.radix_system_id AND rsp2.`key`='operatorTest'
+        WHERE rsp1.id IS NULL AND rsp2.id IS NULL AND source <> 'similarity'
+
+SELECT * 
+FROM  `radix_system` rs
+LEFT JOIN similar_radix_system srs ON rs.id = srs.radix_system_id_from
+LEFT JOIN radix_system_property rsp ON rsp.radix_system_id = srs.radix_system_id_to
+AND rsp.`key` =  'optimized'
+AND rsp.`value` =  '1'
+WHERE rsp.id IS NOT NULL 
+LIMIT 0 , 30
+
+
+
+
+
+INSERT INTO radix_system_property (radix_system_id, `key`, `value`)
+SELECT radix_system_id_to, 'optimizedFromWith', 'volume'
+FROM similar_radix_system
+WHERE transform_type='optimizer:volume';
+
+INSERT INTO radix_system_property (radix_system_id, `key`, `value`)
+SELECT radix_system_id_to, 'optimizedFromWith', 'complex'
+FROM similar_radix_system
+WHERE transform_type='optimizer:complex';
+
+
+SELECT * FROM `radix_system` rs
+    LEFT JOIN radix_system_property rsp ON rs.id=rsp.radix_system_id AND rsp.`key`='optimized'
+    LEFT JOIN similar_radix_system srs ON rs.id = srs.radix_system_id_from
+        WHERE srs.radix_system_id_to IS NULL AND rsp.`value`=1
+
