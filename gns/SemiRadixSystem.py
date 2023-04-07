@@ -60,30 +60,30 @@ class SemiRadixSystem(object):
             return self.cover_box_size
 
         x = matrix.identity(self.dimension)
-        v1 = [0] * self.dimension
-        v2 = [0] * self.dimension
-        v3 = [0] * self.dimension
-        v4 = [0] * self.dimension
+        local_minimum_vector = [0] * self.dimension
+        global_minimum_vector = [0] * self.dimension
+        local_maximum_vector = [0] * self.dimension
+        global_maxium_vector = [0] * self.dimension
 
         while x.norm(Infinity) >= eps:
             x = x * self.inverse_base
             multiplied_digits = [x * vector(i) for i in self.get_digits()]
 
             for i in range(self.dimension):
-                y = 0
-                z = 0
+                local_minimum_per_dimension = 0
+                local_maximum_per_dimension = 0
                 for j in multiplied_digits:
-                    y = min(j[i], y)
-                    z = max(j[i], z)
-                v1[i] = y
-                v3[i] = z
-            v2 = [v1[i] + v2[i] for i in range(len(v1))]
-            v4 = [v3[i] + v4[i] for i in range(len(v3))]
+                    local_minimum_per_dimension = min(j[i], local_minimum_per_dimension)
+                    local_maximum_per_dimension = max(j[i], local_maximum_per_dimension)
+                local_minimum_vector[i] = local_minimum_per_dimension
+                local_maximum_vector[i] = local_maximum_per_dimension
+            global_minimum_vector = [local_minimum_vector[i] + global_minimum_vector[i] for i in range(len(local_minimum_vector))]
+            global_maxium_vector = [local_maximum_vector[i] + global_maxium_vector[i] for i in range(len(local_maximum_vector))]
         temp_multiplier = 1 / (1 - x.norm(Infinity))
-        v3 = [-floor(x * temp_multiplier) for x in v2]
-        v1 = [-ceil(x * temp_multiplier) for x in v4]
+        local_maximum_vector = [-floor(x * temp_multiplier) for x in global_minimum_vector]
+        local_minimum_vector = [-ceil(x * temp_multiplier) for x in global_maxium_vector]
 
-        self.cover_box_size = (v1, v3)
+        self.cover_box_size = (local_minimum_vector, local_maximum_vector)
         return self.cover_box_size
 
     def get_cover_box_volume(self):
