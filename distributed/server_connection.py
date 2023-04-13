@@ -3,19 +3,21 @@ import json
 import urllib
 import urllib.request
 
-def call_server(url, queryParameters={}, postData=None, headers={}, debug=False):
+def call_server(url, query_parameters=None, post_data=None, headers=None, debug=False):
+    if query_parameters is None:
+        query_parameters = {}
 
-    queryParametersEncoded = urllib.parse.urlencode(queryParameters)
+    query_parameters_encoded = urllib.parse.urlencode(query_parameters)
     if debug:
-        print('Url:', url+"?"+urllib.parse.urlencode(queryParameters, doseq=True))
-    if postData == None:
+        print('Url:', url +"?" + urllib.parse.urlencode(query_parameters, doseq=True))
+    if post_data == None:
         data = None
     else:
-        data = urllib.parse.urlencode(postData)
+        data = urllib.parse.urlencode(post_data)
         if debug:
-            print("Data:", urllib.parse.urlencode(postData, doseq=True) )
+            print("Data:", urllib.parse.urlencode(post_data, doseq=True))
     try:
-        request = urllib.request.Request(url+"?"+queryParametersEncoded,data=data, headers={"Accept" : "application/json"})
+        request = urllib.request.Request(url+"?"+query_parameters_encoded,data=data, headers={"Accept" : "application/json"})
 #        request.get_method = lambda: "POST"
         contents = urllib.request.urlopen(request).read()
         response_json = contents.decode('utf-8').replace('\0', '')
@@ -24,7 +26,7 @@ def call_server(url, queryParameters={}, postData=None, headers={}, debug=False)
         print('The server couldn\'t fulfill the request.')
         print('Error code: ', e.code)
     #    print 'Url:', url+"?"+urllib.unquote(urllib.urlencode(postData, doseq=True)).decode('utf8') 
-        print('Url:', url+"?"+urllib.urlencode(postData, doseq=True) )
+        print('Url:', url +"?" + urllib.urlencode(post_data, doseq=True))
         print(e.read())
     except urllib.error.URLError as e:
         print('We failed to reach a server.')
