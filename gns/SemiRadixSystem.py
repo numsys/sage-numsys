@@ -11,34 +11,37 @@ import random
 
 
 class SemiRadixSystem(object):
-    def phi_function(self, v):
+    def phi_function(self, v, return_digit=False):
         """
         Computes the Phi function for a given point v
         """
         digit = self.digit_object.get_congruent_element(v, self)
-        return (self.inverse_base * (vector(v) - vector(digit))).list()
+        result = (self.inverse_base * (vector(v) - vector(digit))).list()
+        if return_digit:
+            return result, digit
+        else:
+            return result
 
-    def phi_function_with_digit(self, v):
-        """
-        Computes the Phi function for a given point v and gives back the congruent element as well
-        """
-        digit = self.digit_object.get_congruent_element(v, self)
-        return (self.inverse_base * (vector(v) - vector(digit))).list(), digit
-
-    def get_orbit_from(self, v):
+    def get_orbit_from(self, v, return_digits=False):
         """
         Computes the orbit from the starting point v
         """
         orbit = []
+        digits = []
         step_from = v
 
         while step_from not in orbit:
             orbit.append(step_from)
-            step_from = self.phi_function(step_from)
+            step_from, digit = self.phi_function(step_from, return_digit=True)
+            if return_digits:
+                digits.append(digit)
 
         orbit.append(step_from)
 
-        return orbit
+        if return_digits:
+            return orbit, digits
+        else:
+            return orbit
 
     def has_finite_expansion(self, v):
         temp = self.get_orbit_from(v)
@@ -385,7 +388,7 @@ class SemiRadixSystem(object):
             raise FullResidueSystemException(
                 "The digit set must be a full residue system, it should have |det(M)| elements...")
         digits_list = []
-        self.digits_hash = []
+        self.digits_by_hash = []
         digits = self.get_digits()
 
         smith_diagonal = self.get_smith_diagonal_list()
@@ -405,7 +408,7 @@ class SemiRadixSystem(object):
             else:
                 digits_list.append(res)
         for i in range(len(digits_list)):
-            self.digits_hash.append(digits[digits_list.index(i)])
+            self.digits_by_hash.append(digits[digits_list.index(i)])
         return True
 
     def __init__(self, m, digits=None, operator=None,
@@ -476,7 +479,7 @@ class SemiRadixSystem(object):
     def get_digit_hash(self):
         if not hasattr(self,'digit_hash'):
             self.check_crs_property_and_build_digits_hashes()
-        return self.digits_hash
+        return self.digits_by_hash
 
     def calculate_smith_form(self):
         self.smith_d, self.smith_u, self.smith_v = to_dense(self.base).smith_form()
@@ -504,3 +507,10 @@ class SemiRadixSystem(object):
         if not self.operator.is_initialized():
             self.operator.init_operator(self)
         return self.operator
+
+    def get_expansion(self, c):
+        orbit,digits = self.get_orbit_from(c,return_digits=True)
+        if orbit[-1] != [0] * self.get_dimension():
+            raise Exception(f'{c} does not have expansion.')
+
+        return digits[:-1]
