@@ -187,7 +187,7 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': True,
                 'assertVariable':
                     {
-                        'digits': [[0, 0], [1, 0], [0, -1], [0, 1], [-1, 0]]
+                        'digits': [[0, 0], [0, 1], [1, 0], [-1, 0], [0, -1]]
                     },
             },
             {
@@ -196,8 +196,8 @@ class RadixSystemTest(unittest.TestCase):
                 'isGNS': True,
                 'assertVariable':
                     {
-                        'digits': [[0, 0], [1, 0], [-1, -1], [0, -1], [1, -1],
-                                   [1, 2], [-1, 1], [0, 1], [1, 1], [-1, 0]]
+                        'digits': [[0, 0], [0, 1], [1, -1], [1, 0],
+                                    [1, 1], [1, 2], [-1, -1], [-1, 0], [-1, 1], [0, -1]]
                     },
             },
             {
@@ -375,12 +375,11 @@ class RadixSystemTest(unittest.TestCase):
 
             for assertation in subject['assertVariable']:
                 print('Testing variable', assertation)
-                self.assertEqual(getattr(subject['numsys'], assertation), subject['assertVariable'][assertation])
+                self.assertEqual(subject['assertVariable'][assertation], getattr(subject['numsys'], assertation))
 
 
         for d in subject['numsys'].get_digits():
-            self.assertEqual(subject['numsys'].phi_function(d),
-                             [0 for x in range(subject['numsys'].get_dimension())])
+            self.assertEqual([0 for x in range(subject['numsys'].get_dimension())],subject['numsys'].phi_function(d))
 
         # operator test....
 
@@ -389,26 +388,26 @@ class RadixSystemTest(unittest.TestCase):
                 if self.debug:
                     print('Phi test from', test_case['from'])
 
-                self.assertEqual(subject['numsys'].phi_function(test_case['from']), test_case['to'])
+                self.assertEqual(test_case['to'],subject['numsys'].phi_function(test_case['from']))
 
         if 'orbitTests' in subject:
             for test_case in subject['orbitTests']:
                 if self.debug:
                     print('Orbit test from', test_case['from'])
 
-                self.assertEqual(subject['numsys'].get_orbit_from(test_case['from']), test_case['to'])
+                self.assertEqual(test_case['to'],subject['numsys'].get_orbit_from(test_case['from']))
 
         if 'coverBox' in subject:
             if self.debug:
                 print('Cover box test')
 
-            self.assertEqual(subject['numsys'].compute_cover_box(), subject['coverBox'])
+            self.assertEqual(subject['coverBox'],subject['numsys'].compute_cover_box())
 
         if 'isGNS' in subject:
             if self.debug:
                 print('Decision test')
 
-            self.assertEqual(subject['numsys'].is_gns(), subject['isGNS'])
+            self.assertEqual(subject['isGNS'],subject['numsys'].is_gns())
 
     def test_simple_optimization(self):
         rs = SemiRadixSystem([[0, -7], [1, -7]], SymmetricDigits())
