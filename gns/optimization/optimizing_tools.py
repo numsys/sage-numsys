@@ -48,15 +48,15 @@ def calculate_volume(actual_value, transform=None, epsilon=0.01):
     return vol
 
 
-def dimension_target_function(avtual_value, transform=None, epsilon=0.01):
+def dimension_target_function(actual_value, transform=None, epsilon=0.01):
     print("Start")
-    n = avtual_value[0].nrows()
+    n = actual_value[0].nrows()
     m_k = matrix.identity(n)
     lower = [0] * n
     upper = [0] * n
     while True:
-        m_k = m_k * avtual_value[0]
-        crs_k = m_k * avtual_value[1]
+        m_k = m_k * actual_value[0]
+        crs_k = m_k * actual_value[1]
         minimum = [0] * n
         maximum = [0] * n
         for i in range(n):
