@@ -1,28 +1,38 @@
-class FullResidueSystemException(Exception):
+class NumsysException(Exception):
+    def __init__(self):
+        super().__init__()
+
+class FullResidueSystemException(NumsysException):
     def __init__(self, value):
+        super().__init__()
         self.value = value
 
 
-class ExpansivityException(Exception):
+class ExpansivityException(NumsysException):
     def __init__(self, value):
+        super().__init__()
         self.value = value
 
 
-class UnitConditionException(Exception):
+class UnitConditionException(NumsysException):
     def __init__(self, value):
+        super().__init__()
         self.value = value
 
 
-class RegularityException(Exception):
+class RegularityException(NumsysException):
     def __init__(self, value):
+        super().__init__()
         self.value = value
 
 
-class OptimizationFailed(Exception):
+class OptimizationFailed(NumsysException):
     def __init__(self, value):
+        super().__init__()
         self.value = value
 
 
-class SmartDecideTimeout(Exception):
+class SmartDecideTimeout(NumsysException):
     def __init__(self, value):
+        super().__init__()
         self.value = value
