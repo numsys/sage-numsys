@@ -1,102 +1,109 @@
 import datetime
 import socket
 import json
+import pandas as pd
 
 from distributed.base import BASE_URL
-from gns import complex_target_function, dimension_target_function, calculate_volume, Timer, Drawer
+from gns import complex_target_function, dimension_target_function, calculate_volume, Timer, Drawer, NumsysException
 from orbit_count import count_orbits
 from sage.all import *
 from gns.SemiRadixSystem import SemiRadixSystem
 from gns.digits import ShiftedCanonicalDigits, CanonicalDigits, SymmetricDigits, Digits
-from gns.Operator import AlwaysExceptionOperator
+from gns.Operator import AlwaysExceptionOperator, Operator
 from server_connection import call_server, ServerJsonEncoder
 from optimizing import phi_optimize_target_function, coef_string_to_polynom, create_companion_matrix_from_polynom
 
 
-def upload_rs(rs: SemiRadixSystem, group, baseGeneratedBy, digitGeneratedBy, source="manual"):
+def upload_rs(case: str, rs: SemiRadixSystem, group, base_generated_by, digit_generated_by, source="manual"):
     if rs.get_dimension() < 2:
         print(rs.get_base(), "Dropped because of the small dimension.")
-    else:
-        print("----------------")
-        print(rs.get_base(), rs.get_digits())
+        return
 
-        encodedBase = json.dumps(rs.get_base(), cls=ServerJsonEncoder)
-        encodedDigits = json.dumps(rs.get_digits(), cls=ServerJsonEncoder)
+    print("----------------")
+    print(rs.get_base(), rs.get_digits())
 
-        alreadyExistingVersionResponse = call_server(BASE_URL + "search-by-base-and-digit-set", {}, {
-            'base': encodedBase,
-            'digits': encodedDigits,
-        })
+    encoded_base = json.dumps(rs.get_base(), cls=ServerJsonEncoder)
+    encoded_digits = json.dumps(rs.get_digits(), cls=ServerJsonEncoder)
 
-        print("Existing Test:", alreadyExistingVersionResponse)
+    alreadyExistingVersionResponse = call_server(BASE_URL + "search-by-base-and-digit-set", {}, {
+        'base': encoded_base,
+        'digits': encoded_digits,
+    })
 
+    print("Existing Test:", alreadyExistingVersionResponse)
+
+    if alreadyExistingVersionResponse["result"] == "NOT_FOUND":
         response = call_server(BASE_URL + "add",
                                {},
                                {
-                                   'base': encodedBase,
-                                   'digits': encodedDigits,
+                                   'base': encoded_base,
+                                   'digits': encoded_digits,
                                    'group': group,
-                                   'baseGeneratedBy': baseGeneratedBy,
-                                   'digitsGeneratedBy': digitGeneratedBy,
+                                   'baseGeneratedBy': base_generated_by,
+                                   'digitsGeneratedBy': digit_generated_by,
                                    'source': source,
                                    'priority': 100,
                                    'token': 'asdasd',
                                }
                                )
-
-        if alreadyExistingVersionResponse["result"] == "NOT_FOUND":
-            call_server(BASE_URL + "add-properties",
-                        {},
-                        {
-                            'RSId': response["id"],
-                            'properties': json.dumps({
-                                'block': "waiting for operator test"
-                            }, cls=ServerJsonEncoder),
-                            'token': 'asdasd',
-                        }
-                        )
-
-
-def upload_cases(fname, group, base_generated_by, digits_generated_by, min_size=2, max_size=40, per_dimension_max=None):
-    lines = [line.rstrip('\n') for line in open(fname)]
-
-    for testCase in lines:
-        dimensionCounter = {x: 0 for x in range(min_size, max_size + 1)}
-        # print(testCase)
-        p = coef_string_to_polynom(testCase)
-        # print(p.degree())
-        if p.degree() <= max_size and p.degree() >= min_size and (
-                per_dimension_max == None or dimensionCounter[p.degree()] < per_dimension_max):
-            dimensionCounter[p.degree()] += 1
-            m = create_companion_matrix_from_polynom(p)
-            try:
-                if not isinstance(digits_generated_by, list):
-                    digits_generated_by = [digits_generated_by]
-
-                for digitsGeneratedByOne in digits_generated_by:
-                    if digitsGeneratedByOne == 'canonical':
-                        digits = CanonicalDigits()
-                    elif digitsGeneratedByOne == 'symmetric':
-                        digits = SymmetricDigits()
-                    elif digitsGeneratedByOne.startswith("canonical"):
-                        digits = ShiftedCanonicalDigits(shift=int(digitsGeneratedByOne[10:]))
-                    else:
-                        raise Exception("Unknown digits generator")
-
-                    rs = SemiRadixSystem(m, digits, AlwaysExceptionOperator())
-                    upload_rs(rs, group, base_generated_by, digitsGeneratedByOne)
-
-            except Exception as e:
-                print("'", testCase, "\tfailed\t", e)
+        call_server(BASE_URL + "add-properties",
+                    {},
+                    {
+                        'RSId': response["id"],
+                        'properties': json.dumps({
+                            'digit_generator': digit_generated_by,
+                            'charpoly': case
+                        }, cls=ServerJsonEncoder),
+                        'token': 'asdasd',
+                    }
+                    )
 
 
-if sys.argv[1] == "garsia":
-    upload_cases("sortedGreppedInput.txt", "garsia", 'garsia', 'canonical', 2, 5)
-elif sys.argv[1] == "det3":
-    upload_cases("c3deg10SortedGrepped.txt", "det3", 'det3', ['canonical', 'symmetric', 'canonical-2'], 2, 5)
-elif sys.argv[1] == "det5":
-    #        upload_cases("c5deg8SortedGrepped.txt","det5",'det5',['canonical','canonical-1','canonical-2','canonical-3','canonical-4'],5,5)
-    upload_cases("c5deg8SortedGrepped.txt", "det5", 'det5', ['canonical'], 2, 5)
-elif sys.argv[1] == "det7":
-    #        upload_cases("c7deg6SortedGrepped.txt","det7",'det7',['canonical', 'canonical-1', 'canonical-2', 'canonical-3', 'canonical-4', 'canonical-5', 'canonical-6'],5,5)
-    upload_cases("c7deg6SortedGrepped.txt", "det7", 'det7', ['canonical'], 2, 3)
+rs_counter = 0
+ok_counter = 0
+df_dict = []
+def upload_cases(file_name, verbose = False):
+    global rs_counter, ok_counter, df_dict
+    lines = [line.rstrip('\n') for line in open(file_name)][:2]
+
+    for case in lines:
+        p = coef_string_to_polynom(case)
+        m = create_companion_matrix_from_polynom(p)
+        degree = p.degree()
+        c = abs(p[0])
+        if verbose:
+            print('--------------')
+            print(case)
+            print(p)
+            print(c)
+            print(degree)
+            print(m)
+            restored_polynom = ' '.join([str(x) for x in m.charpoly().coefficients(sparse=False)])
+            print(restored_polynom)
+            print(restored_polynom == case)
+
+        for shift in range(c):
+            for j in range(degree):
+                try:
+                    digits = ShiftedCanonicalDigits(j=j+1, shift=shift)
+                    rs = SemiRadixSystem(m, digits, Operator(), check_crs_property=True, check_expansivity_property=True)
+                    #print(rs.get_digits())
+                    #print('----->ok')
+                    ok_counter += 1
+                    if ok_counter % 100 == 0:
+                        print(ok_counter,rs_counter)
+
+                    #df_dict.append({'case':case,'constant':c, 'j':j,'shift':shift})
+
+                    #if len(df_dict) % 5000 == 0:
+                    #    pd.DataFrame.from_records(df_dict).to_csv('tested_systems.csv')
+                    upload_rs(case, rs, 'basic', 'companion', f'shifted_pos{j+1}_shift{shift}')
+                except NumsysException as e:
+                    print("'", case, "\tfailed\t", e)
+
+        rs_counter += 1
+
+
+if __name__ == '__main__':
+    upload_cases('../polynoms/c0-5d0-6.txt')
+    print(f'{ok_counter} candidate from {rs_counter} base')

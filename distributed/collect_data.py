@@ -1,6 +1,6 @@
 import pandas as pd
 
-from distributed.download import download_by_filters, download_raw_by_filters
+from distributed.helpers.download import download_raw_by_filters
 
 records = []
 for r in download_raw_by_filters('',10000000):

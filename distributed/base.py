@@ -1,2 +1,2 @@
 
-BASE_URL = "http://numsys.info/radix-system/"
+BASE_URL = "http://numsys.info/beta/radix-system/"
