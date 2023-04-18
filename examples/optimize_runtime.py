@@ -1,8 +1,4 @@
-from sage.all import *
-
-from distributed.download import download_by_ids, download_by_filters
-from gns import *
-import sys
+from distributed.helpers.download import download_by_filters
 
 from gns import Timer
 
