@@ -1,3 +1,4 @@
+import json
 import socket
 import time
 import datetime
@@ -5,7 +6,8 @@ import datetime
 from sage.all import *
 
 from distributed.base import BASE_URL
-from distributed.server_connection import call_server
+from distributed.server_connection import call_server, ServerJsonEncoder
+
 
 def get_actual_date_time_string():
     return '{date:%Y-%m-%d %H:%M:%S}'.format(date=datetime.datetime.now())
@@ -42,26 +44,7 @@ def run_work(callback, url=BASE_URL + "list", data: dict=None):
         progressed.append(data)
     return progressed
 
-
-def build_request_data(job_name : str, extra_query_data):
-    if extra_query_data is None:
-        extra_query_data = {}
-
-    lock_name = f'progress_{job_name}'
-
-    query_data = {
-        "propertyName": lock_name,
-        "propertyValue": "in progress by " + socket.gethostname(),
-        "sort_property": "volume",
-        "sort_direction": "asc",
-        "." + lock_name: "null",
-    }
-
-    query_data.update(extra_query_data)
-    return query_data
-
-
-def start_processor(callback, lock_name, conditions=None, input_run_work=run_work):
+def start_processor(callback, job_name, conditions=None, input_run_work=run_work):
     if conditions is None:
         conditions = {}
 
@@ -70,12 +53,34 @@ def start_processor(callback, lock_name, conditions=None, input_run_work=run_wor
     try_counter = 0
     while True:
         processed = None
+        lock_prop_name = f'progress_{job_name}'
+        done_prop_name = f'done_{job_name}'
         while processed == None or len(processed) > 0:
             print("PROCESSSS", get_actual_date_time_string())
-            queryData = build_request_data(lock_name, conditions)
-            processed = input_run_work(callback, BASE_URL + "set-property-for-first", queryData)
+
+            query_data = {
+                "." + done_prop_name: "null",
+                "." + lock_prop_name: "null",
+                "sort_property": "volume",
+                "sort_direction": "asc",
+                "propertyName": lock_prop_name,
+                "propertyValue": "in progress by " + socket.gethostname(),
+            }
+            query_data.update(conditions)
+
+            processed = input_run_work(callback, BASE_URL + "set-property-for-first", query_data)
             for processed_rs in processed:
-                call_server(BASE_URL + "remove-property", {}, {"id": processed_rs["id"], "propertyName": lock_name})
+                call_server(BASE_URL + "add-properties",
+                            {},
+                            {
+                                'RSId': processed_rs["id"],
+                                'properties': json.dumps({
+                                    done_prop_name: 1,
+                                }, cls=ServerJsonEncoder),
+                                'token': 'asdasd',
+                            }
+                            )
+                call_server(BASE_URL + "remove-property", {}, {"id": processed_rs["id"], "propertyName": lock_prop_name})
 
             if len(processed):
                 try_counter = 0
