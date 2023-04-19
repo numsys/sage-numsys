@@ -30,8 +30,6 @@ def create_radix_system(data):
 
 
 def run_work(callback, url=BASE_URL + "list", data: dict=None):
-    if data is None:
-        data = {}
     radix_systems = call_server(url, data)
     progressed = []
     for data in radix_systems:
@@ -44,7 +42,7 @@ def run_work(callback, url=BASE_URL + "list", data: dict=None):
         progressed.append(data)
     return progressed
 
-def start_processor(callback, job_name, conditions=None, input_run_work=run_work):
+def start_processor(callback, job_name, conditions=None):
     if conditions is None:
         conditions = {}
 
@@ -61,6 +59,7 @@ def start_processor(callback, job_name, conditions=None, input_run_work=run_work
             query_data = {
                 "." + done_prop_name: "null",
                 "." + lock_prop_name: "null",
+                ".volume": "<>null",
                 "sort_property": "volume",
                 "sort_direction": "asc",
                 "propertyName": lock_prop_name,
@@ -68,7 +67,8 @@ def start_processor(callback, job_name, conditions=None, input_run_work=run_work
             }
             query_data.update(conditions)
 
-            processed = input_run_work(callback, BASE_URL + "set-property-for-first", query_data)
+            processed = run_work(callback, BASE_URL + "set-property-for-first", query_data)
+            # In Theory it is only ONE:)
             for processed_rs in processed:
                 call_server(BASE_URL + "add-properties",
                             {},
