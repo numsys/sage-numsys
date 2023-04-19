@@ -1,8 +1,8 @@
 from sage.all import *
-
-from distributed.optimizing import calculate_volume
 from gns import *
 import sys
+
+from gns import calculate_volume
 
 dr = Drawer()
 
