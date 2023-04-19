@@ -6,6 +6,10 @@ import urllib.error
 import urllib.request
 import sage
 from sage.all import *
+
+from distributed.base import BASE_URL
+
+
 def call_server(url, query_parameters=None, post_data=None, headers=None, debug=False):
     if query_parameters is None:
         query_parameters = {}
@@ -31,13 +35,23 @@ def call_server(url, query_parameters=None, post_data=None, headers=None, debug=
     except urllib.error.HTTPError as e:
         print('The server couldn\'t fulfill the request.')
         print('Error code: ', e.code)
-    #    print 'Url:', url+"?"+urllib.unquote(urllib.urlencode(postData, doseq=True)).decode('utf8') 
-        print('Url:', url +"?" + urllib.urlencode(post_data, doseq=True))
+        print('Url:', url +"?" + urllib.parse.urlencode(query_parameters, doseq=True))
+        print('Data:', urllib.parse.urlencode(post_data, doseq=True))
         print(e.read())
     except urllib.error.URLError as e:
         print('We failed to reach a server.')
         print('Reason: ', e.reason)
-        
+
+
+def call_server_add_property(id,properties):
+    call_server(BASE_URL + "add-properties",
+                {},
+                {
+                    'RSId': id,
+                    'properties': json.dumps(properties, cls=ServerJsonEncoder),
+                    'token': 'asdasd',
+                }
+                )
 
 import numpy as np
 

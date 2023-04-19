@@ -1,141 +1,89 @@
-import json
-
 from sage.all import *
 
-from distributed.base import BASE_URL
-from distributed.helpers.worker_handling import create_radix_system
 from distributed.optimizing import phi_optimize_target_function
-from distributed.server_connection import call_server, ServerJsonEncoder
-from gns import complex_target_function, Timer
-
-cand_num = 10
-num_of_cand_to_mutate = 10
-mutate_num = 100
-iterate_num = 500
-
-def optimizing(data, ns):
-    optimizedNs, transformation = ns.optimize(candNum=cand_num,
-                                              numOfCandToMutate=num_of_cand_to_mutate,
-                                              mutateNum=mutate_num,
-                                              iterateNum=iterate_num,
-                                              targetFunction=complex_target_function,
-                                              debug=False,
-                                              returnTransformationAlso=true,
-                                              timeout=1800)
-
-    isOptimized = transformation != matrix.identity(ns.getDimension())
-
-    if isOptimized:
-        res = call_server(BASE_URL + "add-similar",
-                          {},
-                          {
-                              'RSFromId': data["id"],
-                              'token': 'asdasd',
-                              'transformMatrix': json.dumps(transformation, cls=ServerJsonEncoder),
-                              'transformType': 'optimizer:complex',
-                              'transformProperties': json.dumps({
-                                  "candNum": cand_num,
-                                  "numOfCandToMutate": num_of_cand_to_mutate,
-                                  "mutateNum": mutate_num,
-                                  "iterateNum": iterate_num
-                              }, cls=ServerJsonEncoder),
-                              'base': json.dumps(optimizedNs.get_base(), cls=ServerJsonEncoder),
-                              'digits': json.dumps(optimizedNs.get_digits(), cls=ServerJsonEncoder),
-                              'digitsGeneratedBy': data['digitsGeneratedBy'],
-                              'baseGeneratedBy': data['baseGeneratedBy'],
-                              'priority': max(data["priority"] - 10, 0),
-                          }
-                          )
-
-        call_server(BASE_URL + "add-properties",
-                    {},
-                    {
-                        'RSId': res["id"],
-                        'properties': json.dumps({
-                            'optimizedFromWith': 'complex'
-                        }, cls=ServerJsonEncoder),
-                        'token': 'asdasd',
-                    }
-                    )
-
-    call_server(BASE_URL + "add-properties",
-                {},
-                {
-                    'RSId': data["id"],
-                    'properties': json.dumps({
-                        'optimized': 1 if isOptimized else 0
-                    }, cls=ServerJsonEncoder),
-                    'token': 'asdasd',
-                }
-                )
+from distributed.server_connection import call_server_add_property
+from gns import complex_target_function, Timer, SemiRadixSystem, calculate_volume
 
 
-def measureTime(data, ns):
+def assert_equal(a,b,message):
+    if a != b:
+        raise Exception(message)
 
-    pointLimit = 10000
 
-    bestsRaw = call_server(BASE_URL + "find-best-optimalizations",
-                           {
-                               'RSId': data["id"],
-                               'token': 'asdasd',
-                           }
-                           )
-    bests = bestsRaw["data"]
-
-    optimalizations = {}
-    for optimalizationType in bests:
-        act = bests[optimalizationType]
-        ns = create_radix_system(act["system"])
-        resultTransform = matrix.identity(ns.get_dimension())
-        for transform in act["transform_matrices"]:
-            resultTransform = resultTransform * Matrix(ZZ, transform)
-        optimalizations[optimalizationType] = {
-            "system": ns,
-            "transform": resultTransform
-        }
-
-    properties = {"measureTimeDone": "1"}
-
+def optimizing(data, rs: SemiRadixSystem):
     t = Timer()
 
-    for optName in optimalizations:
-        opt = optimalizations[optName]
+    print(rs.get_base())
+    print(rs.get_digits())
+    t.start_timer()
+    # Vol
+    vol_opt_rs, vol_opt_transformation = rs.optimize(target_function=calculate_volume,return_transformation_also=true,timeout=1800)
 
-        t.start_timer()
-        properties[optName + ":IsGNSResult"] = 1 if opt["system"].decideGNS(pointLimit=pointLimit) else 0
-        properties[optName + ":IsGNSTime"] = t.get_time()
+    t.measure_time('optimize:vol:optimize')
+    is_gns = vol_opt_rs.decide_gns()
+    t.measure_time('optimize:vol:decide')
 
-        # Step from the original version
-        optimizedPhi, optimizePhiT = ns.optimize(cand_num, num_of_cand_to_mutate, mutate_num, iterate_num,
-                                                 lambda actVal, T: phi_optimize_target_function(actVal, T, opt[
-                                                     "transform"].inverse()), return_transformation_also=true,
-                                                 debug=False, timeout=None)
+    # Vol + Phi
+    phi_opt_rs_for_vol, phi_opt_transformation_for_vol = rs.optimize(
+        target_function = lambda actual_value, actual_transformation:
+            phi_optimize_target_function(
+            actual_value,
+            actual_transformation,
+            vol_opt_transformation.inverse()
+            ),
+        return_transformation_also=True
+    )
+    t.measure_time('optimize:vol_plus_phi:optimize')
 
-        transformMatrix = optimizePhiT * opt["transform"].inverse()
-        t.start_timer()
-        properties[optName + ":twoTransform:IsGNSResult"] = 1 if optimizedPhi.decideGNS(pointLimit=pointLimit,
-                                                                                        startPointSource=opt[
-                                                                                            "system"],
-                                                                                        pointTransform=transformMatrix) else 0
-        properties[optName + ":twoTransform:IsGNSTime"] = t.get_time()
+    transform_matrix = phi_opt_transformation_for_vol * vol_opt_transformation.inverse()
+    assert_equal(phi_opt_rs_for_vol.decide_gns(start_point_source=vol_opt_rs,point_transform=transform_matrix),is_gns, 'vol_plus_phi decide differs')
+    t.measure_time('optimize:vol_plus_phi:decide')
 
-        # Step from the optimized version
-        optimizedPhi, optimizePhiT = opt["system"].optimize(cand_num, num_of_cand_to_mutate, mutate_num, iterate_num,
-                                                            phi_optimize_target_function,
-                                                            return_transformation_also=True, debug=False,
-                                                            timeout=None)
-        t.start_timer()
-        properties[optName + ":twoTransform2:IsGNSResult"] = 1 if optimizedPhi.decideGNS(pointLimit=pointLimit,
-                                                                                         startPointSource=opt[
-                                                                                             "system"],
-                                                                                         pointTransform=optimizePhiT) else 0
-        properties[optName + ":twoTransform2:IsGNSTime"] = t.get_time()
+    # Vol + VolPhi
+    volphi_opt_rs, volphi_opt_transformation = vol_opt_rs.optimize(
+        target_function = phi_optimize_target_function,
+        return_transformation_also=True
+    )
+    t.measure_time('optimize:vol_plus_volphi:optimize')
+    assert_equal(volphi_opt_rs.decide_gns(start_point_source=vol_opt_rs,point_transform=volphi_opt_transformation),is_gns, 'vol_plus_volphi decide differs')
+    t.measure_time('optimize:vol_plus_volphi:decide')
 
-    call_server(BASE_URL + "add-properties",
-                {},
-                {
-                    'RSId': data["id"],
-                    'properties': json.dumps(properties, cls=ServerJsonEncoder),
-                    'token': 'asdasd',
-                }
-                )
+    ##########################
+    # Complex
+    complex_opt_rs, complex_opt_transformation = rs.optimize(target_function=complex_target_function, return_transformation_also=true, timeout=1800)
+
+    t.measure_time('optimize:complex:optimize')
+    assert_equal(complex_opt_rs.decide_gns(),is_gns,'complex decide result differs')
+    t.measure_time('optimize:complex:decide')
+
+    # Complex + Phi
+    phi_opt_rs_for_complex, phi_opt_transformation_for_complex = rs.optimize(
+        target_function = lambda actual_value, actual_transformation:
+            phi_optimize_target_function(
+            actual_value,
+            actual_transformation,
+            complex_opt_transformation.inverse()
+            ),
+        return_transformation_also=True
+    )
+    t.measure_time('optimize:complex_plus_phi:optimize')
+
+    transform_matrix = phi_opt_transformation_for_complex * complex_opt_transformation.inverse()
+    assert_equal(phi_opt_rs_for_complex.decide_gns(start_point_source=complex_opt_rs,point_transform=transform_matrix),is_gns, 'complex_plus_phi decide differs')
+    t.measure_time('optimize:complex_plus_phi:decide')
+
+    # Complex + ComplexPhi
+    complexphi_opt_rs, complexphi_opt_transformation = complex_opt_rs.optimize(
+        target_function = phi_optimize_target_function,
+        return_transformation_also=True
+    )
+    t.measure_time('optimize:complex_plus_complexphi:optimize')
+    assert_equal(complexphi_opt_rs.decide_gns(start_point_source=complex_opt_rs,point_transform=complexphi_opt_transformation),is_gns, 'complex_plus_complexphi decide differs')
+    t.measure_time('optimize:complex_plus_complexphi:decide')
+
+    properties_to_add = t.get_data()
+    properties_to_add['optimize:complex:volume'] = complex_opt_rs.get_cover_box_volume()
+    properties_to_add['gns'] = 1 if is_gns else 0
+
+    call_server_add_property(data['id'], properties_to_add)
+

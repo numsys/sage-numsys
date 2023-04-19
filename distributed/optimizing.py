@@ -20,7 +20,7 @@ def count_smith_weight(m):
                 if smU[i,j] != 0:
                     weight = weight + 1 
     return weight
-    
+'''
 def calculate_volume(actual_value, transformation_matrix=None, epsilon=0.01):
     dimension = actual_value[0].nrows()
     x = matrix.identity(dimension)
@@ -52,7 +52,7 @@ def calculate_volume(actual_value, transformation_matrix=None, epsilon=0.01):
     for i in range(len(coverBox[0])):
         s = s * (abs(coverBox[0][i] - coverBox[1][i]) + 1)
     return s
-
+'''
     
 def complex_target_function(act_value, transformation_matrix, epsilon=0.01):
     m = act_value[0].inverse()

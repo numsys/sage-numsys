@@ -11,7 +11,7 @@ if len(sys.argv) == 1:
 elif sys.argv[1] == "basic_calculations":
     start_processor(calculate_basics, "basic_calculations")
 elif sys.argv[1] == "optimize":
-    start_processor(optimizing, "optimizing")
+    start_processor(optimizing, "optimization")
 elif sys.argv[1] == "signature":
     start_processor(calculate_signature, "progress_signature", {".volume": "<1000000"})
 elif sys.argv[1] == "generate_multiplications":

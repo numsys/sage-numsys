@@ -336,8 +336,8 @@ class SemiRadixSystem(object):
     def norm(self, v):
         return self.get_operator().norm(v)
 
-    def optimize(self, cand_num=10, num_of_candidate_to_mutate=10, mutate_num=1,
-                 iterate_num=10, target_function=None, recombination=0, return_transformation_also=False, debug=False,
+    def optimize(self, cand_num=10, num_of_candidate_to_mutate=10, mutate_num=100,
+                 iterate_num=500, target_function=None, recombination=0, return_transformation_also=False, debug=False,
                  timeout=None):
 
         optimizer = GeneticSimilarityMatrixOptimizer()
