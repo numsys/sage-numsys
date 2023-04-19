@@ -43,6 +43,9 @@ def call_server(url, query_parameters=None, post_data=None, headers=None, debug=
         print('Reason: ', e.reason)
 
 
+def json_dumps_prop(property):
+    return json.dumps(property, cls=ServerJsonEncoder)
+
 def call_server_add_property(id,properties):
     call_server(BASE_URL + "add-properties",
                 {},
@@ -73,5 +76,4 @@ class ServerJsonEncoder(json.JSONEncoder):
             return np.rint(obj).astype('int')
         else:
             return super(ServerJsonEncoder, self).default(obj)
-            
-            
+
