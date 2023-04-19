@@ -9,16 +9,14 @@ from sage.all import *
 if len(sys.argv) == 1:
     print("Need a parameter: basic_calculations")
 elif sys.argv[1] == "basic_calculations":
-    start_processor(calculate_basics, "basic_calculations", {".dimension": "null"})
-elif sys.argv[1] == "signature":
-    start_processor(calculate_signature, "progress_signature",
-                    {".signature": "null", ".optimized": "0", ".volume": "<1000000"})
+    start_processor(calculate_basics, "basic_calculations")
 elif sys.argv[1] == "optimize":
-    start_processor(optimizing, "progress_optimizing",
-                    {".optimizedFromWith": "complex", "has_similar_radix_system": 0, ".optimized": "null"})
+    start_processor(optimizing, "optimizing")
+elif sys.argv[1] == "signature":
+    start_processor(calculate_signature, "progress_signature", {".volume": "<1000000"})
+elif sys.argv[1] == "generate_multiplications":
+    run_work(generate_multiplications, data={".dimension": "2", "group": "<>multiplication"})
 elif sys.argv[1] == "eigenvalues":
     start_processor(calculate_eigenvalues, "progress_eigenvalues", {".eigenvalueMin": "null"})
-elif sys.argv[1] == "generateMultiplications":
-    run_work(generate_multiplications, data={".dimension": "2", "group": "<>multiplication"})
 else:
     print("Unknown Command")
