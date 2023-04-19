@@ -22,16 +22,15 @@ def calculate_signature(data, ns):
 
     props = {
         'signature': json.dumps(signature, cls=ServerJsonEncoder),
-        'periodicPointCount': len(signature),
+        'periodic_cycle_count': len(signature),
         'gns': 1 if len(signature) == 1 else 0
     }
 
     for cycleIt in range(len(cycles)):
-        #           if cycleIt > 0:
         props["period" + str(cycleIt)] = json.dumps(cycles[cycleIt], cls=ServerJsonEncoder)
-        props["period" + str(cycleIt) + "Length"] = len(cycles[cycleIt])
-        props["period" + str(cycleIt) + "orbitLengths"] = json.dumps(orbitLengths[cycleIt], cls=ServerJsonEncoder)
-        props["period" + str(cycleIt) + "sourceDistances"] = json.dumps(sourceDistances[cycleIt],
+        props["period" + str(cycleIt) + "_length"] = len(cycles[cycleIt])
+        props["period" + str(cycleIt) + "_orbit_lengths"] = json.dumps(orbitLengths[cycleIt], cls=ServerJsonEncoder)
+        props["period" + str(cycleIt) + "_source_distances"] = json.dumps(sourceDistances[cycleIt],
                                                                         cls=ServerJsonEncoder)
 
     call_server(BASE_URL + "add-properties",
