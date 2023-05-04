@@ -79,3 +79,36 @@ def bestones():
     result_df['casecount'] = df.groupby('dimension', as_index=False).count()['id']
 
     print(result_df)
+
+def optimize_draw():
+    '''
+    >>> optimize_draw()
+    '''
+    df = pd.read_csv('systems2.csv')
+    df = df[df['optimize:vol:decide'] > 1]
+    df = df[df['gns'] == 1]
+    plt.figure()
+    ax = plt.gca()
+    print((df['optimize:vol:decide'] / df['optimize:complex:decide']).min())
+    print((df['optimize:vol:decide'] / df['optimize:complex:decide']).max())
+    ax.scatter(df['volume'], df['optimize:vol:decide'] / df['optimize:complex:decide'], c='blue', alpha=0.5)
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    plt.savefig('numsys_complex_optimize_ratio.png')
+
+def bydimension2():
+    '''
+    >>> bydimension2()
+    '''
+    df = pd.read_csv('optimized.csv')
+    df = df.groupby('dimension', as_index=False).mean()
+    plt.figure()
+    plt.plot(df['dimension'], df['optimize:vol:decide'], label='vol', c = 'black')
+    plt.plot(df['dimension'], df['optimize:vol_plus_phi:decide'], label='vol_plus_phi', c = 'blue')
+    plt.plot(df['dimension'], df['optimize:vol_plus_volphi:decide'], label='vol_plus_volphi', c = 'red')
+    plt.plot(df['dimension'], df['optimize:complex:decide'], label='complex', c = 'green')
+    plt.plot(df['dimension'], df['optimize:complex_plus_phi:decide'], label='complex_plus_phi', c = 'orange')
+    plt.plot(df['dimension'], df['optimize:complex_plus_complexphi:decide'], label='complex_plus_complexphi', c = 'purple')
+    plt.yscale('log')
+    plt.legend(loc="upper left")
+    plt.savefig('numsys_optimization_speedup_per_dimension2.png')

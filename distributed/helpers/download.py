@@ -2,6 +2,7 @@ from typing import Generator
 
 import requests
 
+from distributed.base import BASE_URL
 from gns import SemiRadixSystem
 
 
@@ -23,7 +24,7 @@ def download_by_filters(query_param: str, limit : int):
 def download_raw_by_filters(query_param: str, limit : int) -> Generator[dict, None, None]:
     offset = 0
     while True:
-        resp = requests.get(f'http://numsys.info/radix-system/list?{query_param}&size={ONE_STEP_SIZE}&offset={offset}')
+        resp = requests.get(f'{BASE_URL}list?{query_param}&size={ONE_STEP_SIZE}&offset={offset}')
         result = resp.json()
         if len(result) == 0:
             break

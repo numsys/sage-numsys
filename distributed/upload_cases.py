@@ -5,7 +5,6 @@ import pandas as pd
 
 from distributed.base import BASE_URL
 from gns import complex_target_function, dimension_target_function, calculate_volume, Timer, Drawer, NumsysException
-from orbit_count import count_orbits
 from sage.all import *
 from gns.SemiRadixSystem import SemiRadixSystem
 from gns.digits import ShiftedCanonicalDigits, CanonicalDigits, SymmetricDigits, Digits

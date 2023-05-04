@@ -2,6 +2,7 @@ import json
 import socket
 import time
 import datetime
+import subprocess
 
 from sage.all import *
 
@@ -42,6 +43,17 @@ def run_work(callback, url=BASE_URL + "list", data: dict=None):
         progressed.append(data)
     return progressed
 
+def get_in_progress_value() -> str:
+    ret = socket.gethostname()
+    if 'SUBHOST' in os.environ:
+        ret += " / " + os.environ['SUBHOST']
+
+    ret += " at " + get_actual_date_time_string()
+
+    return ret
+
+
+
 def start_processor(callback, job_name, conditions=None):
     if conditions is None:
         conditions = {}
@@ -63,7 +75,7 @@ def start_processor(callback, job_name, conditions=None):
                 "sort_property": "volume",
                 "sort_direction": "asc",
                 "propertyName": lock_prop_name,
-                "propertyValue": "in progress by " + socket.gethostname(),
+                "propertyValue": get_in_progress_value(),
             }
             query_data.update(conditions)
 

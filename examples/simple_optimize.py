@@ -1,4 +1,8 @@
+import json
+
 from sage.all import *
+
+from distributed.server_connection import ServerJsonEncoder
 from gns import *
 import sys
 
@@ -17,7 +21,9 @@ print(cover_box)
 g = dr.get_fractions_set_plot(rs) + rectangle(cover_box[0],cover_box[1])
 g.save("numsys_optimize_fraction_pre.png", figsize=8)
 
-optimized_rs = rs.optimize(target_function=calculate_volume)
+optimized_rs, transformation = rs.optimize(target_function=calculate_volume, return_transformation_also=True)
+
+print(json.dumps({'asd':transformation}, cls=ServerJsonEncoder))
 
 print(optimized_rs.get_cover_box_volume())
 cover_box = optimized_rs.get_cover_box()
