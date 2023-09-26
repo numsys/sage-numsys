@@ -310,7 +310,7 @@ class SemiRadixSystem(object):
                 else:
                     s = d
             s = left_matrix * s
-            if all([isinstance(si, Integer) for si in s]) and not all([si == 0 for si in s]):
+            if all([ceil(si) == si for si in s]) and not all([si == 0 for si in s]):
                 return self.get_orbit_from(s)
         return []
 
