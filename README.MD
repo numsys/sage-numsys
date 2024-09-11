@@ -17,6 +17,15 @@ sage unit_test.py
 ```
 That command will initiate a python interpreter that already have the correct local packages.
 
+# Docker
+
+The repository contains a small docker image workspace handler tool. To use it first build the docker image with the following command:
+```
+./build_image.sh sage
+```
+
+Then any folder where you call the `docky.sh sage` command and it will create you a workspace and mounts up the actual working directory into the docker image, so you can work on your local machine on the Sage code.
+
 ## Troubleshoot
 
 List the folder that should contain the link to the sage.
