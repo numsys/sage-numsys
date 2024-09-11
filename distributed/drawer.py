@@ -1,7 +1,11 @@
+import json
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
+
+
 
 def init_df():
     df = pd.read_csv('systems.csv')
@@ -12,6 +16,36 @@ def init_df():
             print(c)
 
     return df
+
+def calculate_closest_witness():
+    '''
+    >>> calculate_closest_witness()
+    '''
+    df = pd.read_csv('systems.csv')
+    df = df[~df['period1sourceDistances'].isna()]
+
+    least_close_by_constant_term = {dim: -1 for dim in range(2,50)}
+    for row in df.to_dict(orient="records"):
+        closest = None
+        # print('---')
+        # print('ID:', row['id'])
+        # print(row['base'])
+        constant_term_abs = len(json.loads(row['digits']))
+        for i in range(1,100):
+            val = row[f'period{i}sourceDistances']
+            if not isinstance(val, str) and np.isnan(val):
+                break
+            else:
+                parsed = json.loads(val)
+                first_non_zero_index = next((i for i, x in enumerate(parsed) if x), None)
+                #print(parsed, first_non_zero_index)
+                if closest is None or first_non_zero_index < closest:
+                    closest = first_non_zero_index
+        #print(closest)
+        if closest > least_close_by_constant_term[constant_term_abs]:
+            least_close_by_constant_term[constant_term_abs] = closest
+
+    print(least_close_by_constant_term)
 
 def scatter_plot():
     '''
@@ -64,37 +98,54 @@ def bydimension():
     plt.legend(loc="upper left")
     plt.savefig('numsys_optimization_speedup_per_dimension.png')
 
-def bestones():
+def bestones(targets):
     '''
-    >>> bestones()
+    >>> bestones(['complex','complex_plus_complexphi','complex_plus_phi','vol_plus_volphi','vol_plus_phi'])
     '''
-    df = init_df()
-    df['complex'] = (df['optimizer:complex:IsGNSTime'] < df['optimizer:volume:IsGNSTime']).astype('int')
-    df['twoTransform'] = (df['optimizer:volume:twoTransform:IsGNSTime'] < df['optimizer:volume:IsGNSTime']).astype('int')
-    df['twoTransform2'] = (df['optimizer:volume:twoTransform2:IsGNSTime'] < df['optimizer:volume:IsGNSTime']).astype('int')
-    df['twoTransformc'] = (df['optimizer:complex:twoTransform:IsGNSTime'] < df['optimizer:volume:IsGNSTime']).astype('int')
-    df['twoTransformc2'] = (df['optimizer:complex:twoTransform2:IsGNSTime'] < df['optimizer:volume:IsGNSTime']).astype('int')
+    df = pd.read_csv('systems3.csv')
+    df = df[df['gns'] == 1]
+    df['optimize:complex'] = (df['optimize:complex:decide'] < df['optimize:vol:decide']).astype('int')
+    df['optimize:complex_plus_complexphi'] = (df['optimize:complex_plus_complexphi:decide'] < df['optimize:vol:decide']).astype('int')
+    df['optimize:complex_plus_phi'] = (df['optimize:complex_plus_phi:decide'] < df['optimize:vol:decide']).astype('int')
+    df['optimize:vol_plus_phi'] = (df['optimize:vol_plus_phi:decide'] < df['optimize:vol:decide']).astype('int')
+    df['optimize:vol_plus_volphi'] = (df['optimize:vol_plus_volphi:decide'] < df['optimize:vol:decide']).astype('int')
+
 
     result_df = df.groupby('dimension', as_index=False).sum()
     result_df['casecount'] = df.groupby('dimension', as_index=False).count()['id']
+    for target in targets:
+        result_df[f'optimize:{target}:percent'] = result_df[f'optimize:{target}'] / result_df['casecount']
 
-    print(result_df)
+    result_df.index = result_df['dimension']
+    target_fields = [f'optimize:{target}:percent' for target in targets]
 
-def optimize_draw():
-    '''
-    >>> optimize_draw()
-    '''
-    df = pd.read_csv('systems2.csv')
-    df = df[df['optimize:vol:decide'] > 1]
-    df = df[df['gns'] == 1]
     plt.figure()
     ax = plt.gca()
-    print((df['optimize:vol:decide'] / df['optimize:complex:decide']).min())
-    print((df['optimize:vol:decide'] / df['optimize:complex:decide']).max())
-    ax.scatter(df['volume'], df['optimize:vol:decide'] / df['optimize:complex:decide'], c='blue', alpha=0.5)
+    result_df[target_fields].plot.bar(rot=0, ax = ax)
+    if len(targets) == 1:
+        ax.get_legend().remove()
+    plt.savefig('numsys_optimize_bar.png')
+
+def optimize_draw(target):
+    '''
+    >>> optimize_draw('vol_plus_phi')
+    '''
+    df = pd.read_csv('systems3.csv')
+    #df = df[df['gns'] == 1]
+    #df = df[df['dimension'] == 2]
+    df = df[df['optimize:vol:decide'] > 1]
+    plt.figure()
+    ax = plt.gca()
+    print((df['optimize:vol:decide'] / df[f'optimize:{target}:decide']).min())
+    print((df['optimize:vol:decide'] / df[f'optimize:{target}:decide']).max())
+    print((df['optimize:vol:decide'] / df[f'optimize:{target}:decide']).mean())
+    print((df['optimize:vol:decide'] / df[f'optimize:{target}:decide']).describe())
+    #ax.scatter(df['volume'], df['optimize:vol:decide'] / df['optimize:complex:decide'], c='blue', alpha=0.5)
+    ax.scatter(df['volume'], df['optimize:vol:decide'], c='blue', alpha=0.5)
+    ax.scatter(df['volume'], df[f'optimize:{target}:decide'], c='red', alpha=0.5)
     ax.set_yscale('log')
     ax.set_xscale('log')
-    plt.savefig('numsys_complex_optimize_ratio.png')
+    plt.savefig(f'numsys_{target}_optimize_ratio.png')
 
 def bydimension2():
     '''

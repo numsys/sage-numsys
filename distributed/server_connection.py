@@ -64,6 +64,8 @@ class ServerJsonEncoder(json.JSONEncoder):
             return list(obj)
         if isinstance(obj, sage.modules.free_module_element.FreeModuleElement):
             return list(obj)
+        elif isinstance(obj, sage.rings.rational.Rational):
+            return int(obj)
         if isinstance(obj, Integer):
             return int(obj)
         if isinstance(obj, np.int_):

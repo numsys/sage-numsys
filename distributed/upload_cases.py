@@ -1,6 +1,8 @@
 import datetime
 import socket
 import json
+import traceback
+
 import pandas as pd
 
 from distributed.base import BASE_URL
@@ -18,7 +20,6 @@ def upload_rs(case: str, rs: SemiRadixSystem, group, base_generated_by, digit_ge
         print(rs.get_base(), "Dropped because of the small dimension.")
         return
 
-    print("----------------")
     print(rs.get_base(), rs.get_digits())
 
     encoded_base = json.dumps(rs.get_base(), cls=ServerJsonEncoder)
@@ -63,7 +64,7 @@ ok_counter = 0
 df_dict = []
 def upload_cases(file_name, verbose = False):
     global rs_counter, ok_counter, df_dict
-    lines = [line.rstrip('\n') for line in open(file_name)][:2]
+    lines = [line.rstrip('\n') for line in open(file_name)]
 
     for case in lines:
         p = coef_string_to_polynom(case)
@@ -84,8 +85,11 @@ def upload_cases(file_name, verbose = False):
         for shift in range(c):
             for j in range(degree):
                 try:
+                    print('====================================================')
+                    print(f'case {case} digits at {j+1} with {shift} shift')
                     digits = ShiftedCanonicalDigits(j=j+1, shift=shift)
                     rs = SemiRadixSystem(m, digits, Operator(), check_crs_property=True, check_expansivity_property=True)
+                    print('CONSTRUCTION DONE')
                     #print(rs.get_digits())
                     #print('----->ok')
                     ok_counter += 1
@@ -98,11 +102,10 @@ def upload_cases(file_name, verbose = False):
                     #    pd.DataFrame.from_records(df_dict).to_csv('tested_systems.csv')
                     upload_rs(case, rs, 'basic', 'companion', f'shifted_pos{j+1}_shift{shift}')
                 except NumsysException as e:
-                    print("'", case, "\tfailed\t", e)
-
+                    print(traceback.format_exc())
         rs_counter += 1
 
 
 if __name__ == '__main__':
-    upload_cases('../polynoms/c0-5d0-6.txt')
+    upload_cases('../polynoms/c0-3d7-8.txt')
     print(f'{ok_counter} candidate from {rs_counter} base')

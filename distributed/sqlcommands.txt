@@ -15,8 +15,8 @@ SELECT * FROM `radix_system_property` WHERE `key` LIKE 'progress%'
 # Nem optimalizált radix rendszerek
 
 SELECT * FROM `radix_system` rs 
-    LEFT JOIN radix_system_property rsp ON rs.id=rsp.radix_system_id AND `key`='optimized' 
-        WHERE rsp.id IS NULL
+    LEFT JOIN radix_system_property rsp ON rs.id=rsp.radix_system_id AND `key`='optimize:complex:decide'
+        WHERE rsp.id IS NOT NULL
 
 
 UPDATE base b 

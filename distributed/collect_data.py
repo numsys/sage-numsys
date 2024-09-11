@@ -10,7 +10,7 @@ for r in download_raw_by_filters('.done_optimization=1',10000000):
 
     if len(records) % 1000 == 0:
         df = pd.DataFrame(records)
-        df.to_csv('systems2.csv')
+        df.to_csv('systems3.csv')
 
 df = pd.DataFrame(records)
-df.to_csv('systems2.csv')
+df.to_csv('systems3.csv')

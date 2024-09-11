@@ -71,14 +71,18 @@ def start_processor(callback, job_name, conditions=None):
             query_data = {
                 "." + done_prop_name: "null",
                 "." + lock_prop_name: "null",
-                ".volume": "<>null",
-                "sort_property": "volume",
-                "sort_direction": "asc",
                 "propertyName": lock_prop_name,
                 "propertyValue": get_in_progress_value(),
             }
-            query_data.update(conditions)
+            if job_name != 'basic_calculations':
+                query_data.update({
+                    ".volume": "<>null",
+                    "sort_property": "volume",
+                    "sort_direction": "asc",
+                })
 
+            query_data.update(conditions)
+            print(query_data)
             processed = run_work(callback, BASE_URL + "set-property-for-first", query_data)
             # In Theory it is only ONE:)
             for processed_rs in processed:
