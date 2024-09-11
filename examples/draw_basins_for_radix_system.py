@@ -5,7 +5,7 @@ import requests
 import sys
 from sage.all import *
 
-to_draw_ids = [468,474, 1313, 1606]
+to_draw_ids = [10118]
 
 for rs_id in to_draw_ids:
     resp = requests.get(f'http://numsys.info/radix-system/list?id={rs_id}')
